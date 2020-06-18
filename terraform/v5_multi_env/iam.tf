@@ -20,7 +20,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "datafence_role_policy_attachment" {
-  # depends_on = [aws_iam_role.datafence_lambda_role]
   role       = "${aws_iam_role.datafence_lambda_role.name}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
