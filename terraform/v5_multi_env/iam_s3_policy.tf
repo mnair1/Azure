@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "datafence_lambda_role_policy" {
-  name        = "s3_put_object_policy"
+  name        = "${var.environment}-${var.team}-${var.s3_policy_name}"
   path        = "/"
   description = "IAM policy for putting object inside s3"
 

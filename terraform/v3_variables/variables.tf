@@ -15,3 +15,9 @@ variable "lambda_name" {
     description = "Name of lambda function"
     default = "devops-datafence-lambda-function-automated"
 }
+
+variable "s3_policy_name" {
+    type = "string"
+    description = "Name of s3 policy"
+    default = "devops-datafence-s3-put-object-policy"
+}
