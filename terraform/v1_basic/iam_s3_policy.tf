@@ -19,5 +19,5 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "datafence_s3_policy_attachment" {
   role       = "devops-datafence-lambda-role-automated"
-  policy_arn = "${aws_iam_policy.datafence_lambda_role_policy.arn}"
+  policy_arn = "aws_iam_policy.datafence_lambda_role_policy.arn"
 }
