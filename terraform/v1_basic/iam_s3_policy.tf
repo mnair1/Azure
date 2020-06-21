@@ -1,5 +1,5 @@
-resource "aws_iam_policy" "datafence_lambda_role_policy" {
-  name        = "s3_put_object_policy"
+resource "aws_iam_policy" "datafence_lambda_role_policy_s3" {
+  name        = "devops-datafence-s3-put-object-policy"
   path        = "/"
   description = "IAM policy for putting object inside s3"
 
@@ -18,6 +18,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "datafence_s3_policy_attachment" {
+  depends_on = [aws_iam_role.datafence_lambda_role]
   role       = "devops-datafence-lambda-role-automated"
-  policy_arn = "${aws_iam_policy.datafence_lambda_role_policy.arn}"
+  policy_arn = aws_iam_policy.datafence_lambda_role_policy_s3.arn
 }
