@@ -1,6 +1,5 @@
 resource "aws_iam_role" "datafence_lambda_role" {
-  #name = "devops-datafence-lambda-role-automated"
-  name = "${var.lambda_role_name}"
+  name = var.lambda_role_name
 
   assume_role_policy = <<EOF
 {
@@ -20,7 +19,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "datafence_role_policy_attachment" {
-  # depends_on = [aws_iam_role.datafence_lambda_role]
-  role       = "${aws_iam_role.datafence_lambda_role.name}"
+  role       = aws_iam_role.datafence_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
