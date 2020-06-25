@@ -26,7 +26,8 @@ def put_to_stream(sensor_id, temp, sensor_timestamp):
 while True:
     temp = random.randint(20, 50)
     sensor_timestamp = calendar.timegm(datetime.utcnow().timetuple())
-    sensor_id = 'aa-bb'
+    locations = ['TORONTO','OTTAWA', 'MONTREAL']
+    sensor_id = random.choice(locations)
 
     put_to_stream(sensor_id, temp, sensor_timestamp)
 
