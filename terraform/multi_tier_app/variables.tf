@@ -13,3 +13,16 @@ variable "ssh_key" {
     description = "ssh key name for ec2"
     default = "devops-ssh"
 }
+
+variable "aws_provider_version" {
+    type = string
+    description = "Terraform aws provider version"
+    default = "2.66.0"
+}
+
+variable "region" {
+    type = string
+    description = "AWS Region"
+    default = "us-east-1"
+}
+

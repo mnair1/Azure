@@ -1,9 +1,9 @@
 terraform {
   required_providers {
-    aws = "2.66.0"
+    aws = var.aws_provider_version
   }
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
