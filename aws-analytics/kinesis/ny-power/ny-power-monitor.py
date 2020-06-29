@@ -11,7 +11,7 @@ ses = boto3.client('ses')
 email_address = 'XXXXXXXXXXXXX'
 
 def lambda_handler(event, context):
-    subject = 'New File uploaded to S3'
+    subject = 'High Power Usage Alert'
     body_text = 'High Power Usage Alert for %s' %  (json.dumps(event['city']))
     ses.send_email(Source=email_address,
                    Destination={'ToAddresses': [email_address]},
