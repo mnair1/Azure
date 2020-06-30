@@ -4,7 +4,7 @@ AWS.config.update({region: 'us-east-1'});
 
 var params = {
   Message: 'ALERT - A new user connection was initiated on the server. Since this is off-period this may be a hacking attempt.', /* required */
-  TopicArn: 'arn:aws:sns:us-east-1:956630041263:alert'
+  TopicArn: 'XXXXXXXXXXXXX'
 };
 
 
