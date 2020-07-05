@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Template for automating Downstream etl"
+
+Resources:
+
+  SparkGlueJob:    
+    Type: AWS::Glue::Job
+    Properties: 
+      Command: 
+        Name: glueetl
+        PythonVersion: '3'
+        ScriptLocation: !Sub s3://devops-datafence-us-east-1-175908995626-s3-bucket-cf/devops-datafence-transformation.py
+      Description: Serverless Spark Job
+      GlueVersion: '1.0'
+      MaxCapacity: '5'
+      MaxRetries: '1'
+      Name: devops-datafence-spark-job
+      Role: !GetAtt SparkJobRole.Arn
+      Timeout: '5'
+     
+  SparkJobRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: devops-datafence-spark-job-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: 
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - glue.amazonaws.com      
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess

@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Template to create IAM role that can be assumed by AWS services'
+
+Parameters:
+
+  Environment:
+    Type: String
+    Description: Environment name
+
+  Team:
+    Type: String
+    Description: Team name
+
+  RoleName:
+    Type: String
+    Description: Role name
+
+  ManagedPolicyArns:
+    Type: String
+    Description: Managed Policy Arns
+    Default: ''
+
+  AllowedServices:
+    Type: String
+    Description: Comma separated allowed services that can assume this IAM role
+
+Conditions:
+  AreManagedPolicyArnsProvided: !Not [ !Equals [ '', !Ref ManagedPolicyArns ]]
+
+Resources:
+  IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Split [",", !Ref AllowedServices]
+            Action:
+              - "sts:AssumeRole"
+      Path: '/'
+      RoleName: !Join ["-", [!Ref Environment, !Ref Team, !Ref RoleName ]]
+      ManagedPolicyArns: !If [AreManagedPolicyArnsProvided, !Split [",", !Ref ManagedPolicyArns], !Ref "AWS::NoValue"]
+      # Tags:
+      #   - Key: Project
+      #     Value: !Ref Project
+      #   - Key: Environment
+      #     Value: !Ref Environment
+
+Outputs:
+  IAMRoleARN:
+    Description: ARN of IAM Role
+    Value: !GetAtt IAMRole.Arn
+
+  IAMRoleName:
+    Description: Name of IAM Role
+    Value: !Ref IAMRole

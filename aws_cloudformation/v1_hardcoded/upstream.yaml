@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Template for automating upstream etl"
+
+Resources:
+
+  TriggerLambda:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code:
+        ZipFile: |
+          import boto3
+          def lambda_handler(event, context):
+              glue_client = boto3.client("glue")
+              glue_client.start_job_run(
+                  JobName="devops-datafence-spark-job") 
+      Description: "Training Lambda Function for Datafence"
+      Environment: 
+         Variables: 
+           Env: cloudformation
+      FunctionName: devops-datafence-lambda-function-cf
+      Handler: index.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt TriggerLambdaIAMRole.Arn
+      Runtime: python3.7
+      Tags: 
+        - Key: Environment
+          Value: dev-automated
+    
+  TriggerLambdaIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: devops-datafence-lambda-role-cf
+      Description: IAM Role for Training Lambda of datafence
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: 
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Policies:
+       - PolicyName: CloudWatch
+         PolicyDocument:
+           Version: '2012-10-17'
+           Statement:
+            - Effect: Allow
+              Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+              Resource:
+                  - !Sub "arn:aws:logs:us-east-1:175908995626:log-group:/aws/lambda/devops-datafence-lambda-function-cf:*"
+
+  InvokeLambdaPerission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt TriggerLambda.Arn
+      SourceAccount: 175908995626
+      Principal: s3.amazonaws.com
+      SourceArn: 'arn:aws:s3:::devops-datafence-us-east-1-175908995626-s3-bucket-cf'
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DependsOn: InvokeLambdaPerission
+    Properties:
+      BucketName: devops-datafence-us-east-1-175908995626-s3-bucket-cf
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Function: !GetAtt TriggerLambda.Arn
+            Event: 's3:ObjectCreated:*'
+            Filter: 
+              S3Key:
+                Rules:
+                  - Name: 'suffix'
+                    Value: '.csv'

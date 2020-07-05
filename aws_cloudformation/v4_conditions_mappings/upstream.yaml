@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Template for automating upstream etl"
+
+Parameters:
+
+  Env:
+    Type: String
+    Description: Name of Env (dev, qa, uat, prod, devops)
+    AllowedValues:
+      - dev
+      - qa
+      - uat
+      - prod
+      - devops
+
+  Team:
+    Type: String
+    Description: Team Name
+    Default: datafence
+
+  LambdaName:
+    Type: String
+    Description: Lamba Name
+    Default: devops-datafence-lambda-function-cf
+
+  # LambdaMemory:
+  #   Type: String
+  #   Description: RAM of Lambda
+  #   Default: '128'
+
+  LambdaRuntime:
+    Type: String
+    Description: Runtime of Lambda
+    Default: python3.7
+
+  BucketName:
+    Type: String
+    Description: bucket name
+    Default: s3-bucket-cf
+
+Mappings:
+
+  LambdaSpecs:
+    LambdaMemory:
+      dev: 128
+      qa: 128
+      uat: 256
+      prod: 256
+      devops: 512
+
+Conditions:
+
+  isDevops: !Equals [!Ref Env, "devops"] 
+
+
+Resources:
+
+  TriggerLambda:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code:
+        ZipFile: |
+          import boto3
+          def lambda_handler(event, context):
+              glue_client = boto3.client("glue")
+              glue_client.start_job_run(
+                  JobName="devops-datafence-spark-job") 
+      Description: "Trigger Lambda Function for Datafence"
+      Environment: 
+         Variables: 
+           Env: !Ref Env
+      FunctionName: !Ref LambdaName
+      Handler: index.lambda_handler
+      MemorySize: !FindInMap [LambdaSpecs, LambdaMemory, !Ref Env]
+      Role: !GetAtt TriggerLambdaIAMRole.Arn
+      Runtime: !If [isDevops, "python2.7", !Ref LambdaRuntime] # AWS::NoValue
+      Tags: 
+        - Key: Environment
+          Value: !Ref Env
+    
+  TriggerLambdaIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${Env}-${Team}-lambda-role-cf
+      Description: IAM Role for Trigger Lambda of datafence
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: 
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Policies:
+       - PolicyName: CloudWatch
+         PolicyDocument:
+           Version: '2012-10-17'
+           Statement:
+            - Effect: Allow
+              Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+              Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/devops-datafence-lambda-function-cf:*"
+
+  InvokeLambdaPerission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt TriggerLambda.Arn
+      SourceAccount: !Ref AWS::AccountId
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub 'arn:aws:s3:::${Env}-${Team}-${AWS::Region}-${AWS::AccountId}-${BucketName}'
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DependsOn: InvokeLambdaPerission
+    Properties:
+      BucketName: !Sub ${Env}-${Team}-${AWS::Region}-${AWS::AccountId}-${BucketName}
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Function: !GetAtt TriggerLambda.Arn
+            Event: 's3:ObjectCreated:*'
+            Filter: 
+              S3Key:
+                Rules:
+                  - Name: 'suffix'
+                    Value: '.csv'
+
+Outputs:
+
+  TriggerLambdaName:
+    Description: Name of triggered lambda
+    Value: !Ref TriggerLambda
+
+  LambdaRole:
+    Description: Name of IAM Role of Lambda
+    Value: !Ref TriggerLambdaIAMRole
+
+  S3Bucket:
+    Description: Name of S3 Bucket
+    Condition: isDevops
+    Value: !Ref S3Bucket
+    Export:
+      Name: !Sub ${AWS::StackName}-S3Bucket
