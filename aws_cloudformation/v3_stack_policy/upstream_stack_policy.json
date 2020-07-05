@@ -1,0 +1,22 @@
+{
+  "Statement" : [
+    {
+      "Effect" : "Allow",
+      "Action" : "Update:*",
+      "Principal": "*",
+      "Resource" : "LogicalResourceId/TriggerLambda*"
+    },
+    {
+      "Effect" : "Allow",
+      "Action" : ["Update:Replace", "Update:Delete", "Update:Modify"],
+      "Principal": "*",
+      "Resource" : "LogicalResourceId/InvokeLambdaPerission*"
+    },
+    {
+      "Effect" : "Deny",
+      "Action" : "Update:*",
+      "Principal": "*",
+      "Resource" : "LogicalResourceId/S3Bucket"
+    }
+  ]
+}

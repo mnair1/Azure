@@ -1,0 +1,118 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Template for automating upstream etl"
+
+Parameters:
+
+  Env:
+    Type: String
+    Description: Name of Env (dev, qa, uat, prod, devops)
+    AllowedValues:
+      - dev
+      - qa
+      - uat
+      - prod
+      - devops
+
+  Team:
+    Type: String
+    Description: Team Name
+    Default: datafence
+
+  LambdaName:
+    Type: String
+    Description: Lamba Name
+    Default: devops-datafence-lambda-function-cf
+
+  LambdaMemory:
+    Type: String
+    Description: RAM of Lambda
+    Default: '128'
+
+  LambdaRuntime:
+    Type: String
+    Description: Runtime of Lambda
+    Default: python3.7
+
+  BucketName:
+    Type: String
+    Description: bucket name
+    Default: s3-bucket-cf
+
+
+Resources:
+
+  TriggerLambda:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code:
+        ZipFile: |
+          import boto3
+          def lambda_handler(event, context):
+              glue_client = boto3.client("glue")
+              glue_client.start_job_run(
+                  JobName="devops-datafence-spark-job") 
+      Description: "Trigger Lambda Function for Datafence"
+      Environment: 
+         Variables: 
+           Env: !Ref Env
+      FunctionName: !Ref LambdaName
+      Handler: index.lambda_handler
+      MemorySize: !Ref LambdaMemory
+      Role: !GetAtt TriggerLambdaIAMRole.Arn
+      Runtime: !Ref LambdaRuntime
+      Tags: 
+        - Key: Environment
+          Value: !Ref Env
+    
+  TriggerLambdaIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${Env}-${Team}-lambda-role-cf
+      Description: IAM Role for Trigger Lambda of datafence
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: 
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Policies:
+       - PolicyName: CloudWatch
+         PolicyDocument:
+           Version: '2012-10-17'
+           Statement:
+            - Effect: Allow
+              Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+              Resource:
+                  - !Sub "arn:aws:logs:us-east-1:175908995626:log-group:/aws/lambda/devops-datafence-lambda-function-cf:*"
+
+  InvokeLambdaPerission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt TriggerLambda.Arn
+      SourceAccount: 175908995626
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub 'arn:aws:s3:::${Env}-${Team}-us-east-1-175908995626-${BucketName}'
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DependsOn: InvokeLambdaPerission
+    Properties:
+      BucketName: !Sub ${Env}-${Team}-us-east-1-175908995626-${BucketName}
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Function: !GetAtt TriggerLambda.Arn
+            Event: 's3:ObjectCreated:*'
+            Filter: 
+              S3Key:
+                Rules:
+                  - Name: 'suffix'
+                    Value: '.csv'
