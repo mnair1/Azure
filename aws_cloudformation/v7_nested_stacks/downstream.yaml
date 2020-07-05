@@ -91,4 +91,4 @@ Resources:
         RoleName: spark-job-role
         AllowedServices: glue.amazonaws.com
         ManagedPolicyArns: arn:aws:iam::aws:policy/AdministratorAccess
-      TemplateURL: https://devops-datafence-s3-bucket-manual.s3.amazonaws.com/nested_stacks/iam-role.yaml
+      TemplateURL: https://devops-datafence-nested-stack-bucket.s3.amazonaws.com/nested_stacks/iam-role.yaml

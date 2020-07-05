@@ -87,7 +87,7 @@ Resources:
         RoleName: lambda-role-cf
         AllowedServices: lambda.amazonaws.com
         ManagedPolicyArns: arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
-      TemplateURL: https://devops-datafence-s3-bucket-manual.s3.amazonaws.com/nested_stacks/iam-role.yaml #nested_stacks/iam-role.yaml
+      TemplateURL: https://devops-datafence-nested-stack-bucket.s3.amazonaws.com/nested_stacks/iam-role.yaml
 
   TriggerLambdaIAMRolePolicy:
     Type: AWS::CloudFormation::Stack
@@ -104,7 +104,7 @@ Resources:
           - 'logs:CreateLogStream'
           - 'logs:PutLogEvents'
         Resource: "*"
-      TemplateURL: https://devops-datafence-s3-bucket-manual.s3.amazonaws.com/nested_stacks/iam-policy.yaml #nested_stacks/iam-policy.yaml
+      TemplateURL: https://devops-datafence-nested-stack-bucket.s3.amazonaws.com/nested_stacks/iam-policy.yaml
 
   InvokeLambdaPerission:
     Type: "AWS::Lambda::Permission"
