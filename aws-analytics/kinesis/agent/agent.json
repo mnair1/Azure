@@ -1,0 +1,21 @@
+{
+  "cloudwatch.emitMetrics": true,
+  "kinesis.endpoint": "",
+  "firehose.endpoint": "https://kinesis.us-east-1.amazonaws.com",
+  "awsAccessKeyId": "XXXXXXXXXXXXXXXXXXXX",
+  "awsSecretAccessKey": "YYYYYYYYYYYYYYYYYYYYYY",
+  "flows": [
+    {
+      "filePattern": "/var/log/httpd/*access*",
+      "kinesisStream": "monitor-stream",
+      "dataProcessingOptions": [
+      {
+        "initialPostion": "START_OF_FILE",
+        "maxBufferAgeMillis":"2000",
+        "optionName": "LOGTOJSON",
+        "logFormat": "COMBINEDAPACHELOG"
+      }]
+    }
+  ]
+}
+
