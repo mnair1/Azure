@@ -24,7 +24,7 @@ def put_to_stream(sensor_id, temp, sensor_timestamp):
                         PartitionKey=sensor_id)
 
 while True:
-    temp = random.randint(20, 50)
+    temp = random.uniform(20, 35)
     sensor_timestamp = calendar.timegm(datetime.utcnow().timetuple())
     locations = ['TORONTO','OTTAWA', 'MONTREAL']
     sensor_id = random.choice(locations)

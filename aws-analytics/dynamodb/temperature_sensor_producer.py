@@ -4,32 +4,37 @@ from datetime import datetime
 import calendar
 import random
 import time
+from decimal import Decimal
 
-stream_name = 'stock'
+dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 
-kinesis_client = boto3.client('kinesis', region_name='us-east-1')
-
-def put_to_stream(symbol, price, ticker_timestamp):
+def put_to_table(sensor_id, temp, sensor_timestamp):
     payload = {
-                'symbol': str(symbol),
-                'price': price,
-                'timestamp': str(ticker_timestamp)
+                'temp': str(temp),
+                'timestamp': str(sensor_timestamp),
+                'sensor_id': sensor_id
               }
 
     print payload
 
-    put_response = kinesis_client.put_record(
-                        StreamName=stream_name,
-                        Data=json.dumps(payload),
-                        PartitionKey=symbol)
+    table = dynamodb.Table('Temperature')
+    response = table.put_item(
+                              Item={
+                                    "id": sensor_id,
+                                    "timestamp": sensor_timestamp,
+                                    "temperature": Decimal(temp)
+                                   }
+                             )
+
 
 while True:
-    price = random.uniform(10.5, 500.5)
-    ticker_timestamp = calendar.timegm(datetime.utcnow().timetuple())
-    symbols = ['AAPL','AMZN','MSFT', 'FB', 'MCD', 'SBUX']
-    symbol = random.choice(symbols)
+    temp = random.uniform(20, 35)
+    sensor_timestamp = calendar.timegm(datetime.utcnow().timetuple())
 
-    put_to_stream(symbol, price, ticker_timestamp)
+    room = ['ROOM1','ROOM2', 'ROOM3']
+    sensor_id = random.choice(room)
+
+    put_to_table(sensor_id, str(round(temp,2)), sensor_timestamp)
 
     # wait for 5 second
     time.sleep(5)
