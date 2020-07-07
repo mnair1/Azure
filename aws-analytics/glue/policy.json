@@ -4,7 +4,7 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "Service": "sagemaker.amazonaws.com"
+        "Service": "glue.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
     }
