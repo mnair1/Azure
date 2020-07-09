@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CF Template for Multi-Tier App EC2
+Parameters:
+  Env:
+    Type: String
+    Description: The environment you're deploying to.  
+    Default: "${Env}"
+  Ec2Name:
+    Description: Name of the EC2 instance. 
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: /${Env}/datafence/EC2/EC2_NAME
+  KeyName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: EC2 SSH Key pair name
+    Default: /${Env}/datafence/EC2/EC2_KEY_NAME
+  InstanceType:
+    Description: Type of EC2 Instance
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /${Env}/datafence/EC2/EC2_INSTANCE_TYPE
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /${Env}/datafence/EC2/EC2_AMI_ID
+  SubnetId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /${Env}/datafence/Network/PUBLIC_SUBNET_1_ID
+  EC2SecurityGroup:
+    Description: EC2 SecurityGroup
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /${Env}/datafence/Network/SG_ID
+
+Resources:
+
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: !Ref InstanceType
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      KeyName: !Ref KeyName
+      ImageId: !Ref AmiId
+      SubnetId: !Ref SubnetId
+      Tags:
+        - Key: Name
+          Value: !Ref Ec2Name
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash -x
+          sudo apt update
+          sudo apt install python3-pip -y
+          pip3 install flask==1.0.2
+          pip3 install flask_pymongo==2.3.0
+          pip3 install flask_cors==3.0.7
+          sudo apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates && curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+          sudo apt -y install nodejs
+          sudo apt install -y mongodb
+
+Outputs:
+
+  SSHInstance:
+    Description: Public DNS of the EC2
+    Value: !GetAtt EC2Instance.PublicDnsName
+
+  AppURL:
+    Description: URL to access Frontend App
+    Value: !Join ["", ["http://", !GetAtt EC2Instance.PublicDnsName, ":3000"]]
+  
