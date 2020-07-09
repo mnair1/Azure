@@ -62,5 +62,5 @@ Outputs:
 
   AppURL:
     Description: URL to access Frontend App
-    Value: !Join ["", ["http://", !GetAtt EC2Instance.PublicDnsName, ":3000"]]
+    Value: !Join ["", ["http://", !GetAtt EC2Instance.PublicIp, ":3000"]]
   
