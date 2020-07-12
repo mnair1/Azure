@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CF Template for Network Modules
+Parameters:
+  Env:
+    Type: "String"
+    Description: "Name of the environment."
+    Default: "${Env}"
+  VpcCidrBlock:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: "CidrBlock for VPC."
+    Default: /${Env}/datafence/Network/VPC_CIDR
+  PublicSubnet1CidrBlock:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: "CidrBlock for public subnet 1."
+    Default: "/${Env}/datafence/Network/PUBLIC_SUBNET_1_CIDR"
+     
+Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+       - Key: Name
+         Value: !Sub ${Env}-datafence-vpc
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: !Ref PublicSubnet1CidrBlock
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      MapPublicIpOnLaunch: true
+      Tags:
+       - Key: Name
+         Value: !Sub ${Env}-datafence-public-subnet1
+    
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+       - Key: Name
+         Value: !Sub ${Env}-datafence-InternetGateway
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+      
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+       - Key: Name
+         Value: !Sub ${Env}-datafence-public-rt
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${Env}-datafence-sg
+      GroupDescription: Allows access to the Multi Tier App FE and SSH
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${Env}-datafence-sg
+
+  VPCSSM:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub /${Env}/datafence/Network/VPC_ID
+      Type: "String"
+      Value: !Ref Vpc
+
+  PublicSubnet1SSM:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub /${Env}/datafence/Network/PUBLIC_SUBNET_1_ID
+      Type: "String"
+      Value: !Ref PublicSubnet1            
+                        
+  SecurityGroupSSM:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub /${Env}/datafence/Network/SG_ID
+      Type: "String"
+      Value: !GetAtt SecurityGroup.GroupId         
+                        
