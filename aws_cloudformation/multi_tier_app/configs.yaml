@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CF Template for Configurations
+
+Parameters:
+  Env:
+    Type: "String"
+    Description: "Name of the environment."
+
+Mappings:
+
+  NetworksMap: 
+    VpcCIDR:
+      dev: "10.0.0.0/16"
+      qa: "10.0.0.0/16"
+      uat: "10.0.0.0/16"
+      prod: "10.0.0.0/16"
+    PublicSubnet1Cidr:
+      dev: "10.0.1.0/24"
+      qa: "10.0.1.0/24"
+      uat: "10.0.1.0/24"
+      prod: "10.0.1.0/24"
+
+  EC2Map:
+ 
+    Ec2Name:
+      dev: multitierd
+      qa: multitierq
+      uat: multitieru
+      prod: multitierp
+    KeyName:
+      dev: devops-ssh
+      qa: datafence-ssh
+      uat: df-ssh
+      prod: cloudformation-ssh
+    Ec2InstanceType:
+      dev: t2.micro
+      qa: t2.small
+      uat: t2.medium
+      prod: t2.large
+    AMIID:
+      dev: ami-085925f297f89fce1
+      qa: ami-085925f297f89fce1
+      prod: ami-085925f297f89fce1
+      uat: ami-085925f297f89fce1
+
+Resources:
+
+  VPCCidrParameter: 
+    Type: "AWS::SSM::Parameter" 
+    Properties: 
+      Name: !Sub /${Env}/datafence/Network/VPC_CIDR
+      Type: "String" 
+      Value: !FindInMap [NetworksMap, VpcCIDR, !Ref Env] 
+
+  SubnetCidrParameter: 
+    Type: "AWS::SSM::Parameter" 
+    Properties: 
+      Name: !Sub "/${Env}/datafence/Network/PUBLIC_SUBNET_1_CIDR"
+      Type: "String" 
+      Value: !FindInMap [NetworksMap, PublicSubnet1Cidr, !Ref Env] 
+
+  EC2NameParameter: 
+    Type: "AWS::SSM::Parameter" 
+    Properties: 
+      Name: !Sub /${Env}/datafence/EC2/EC2_NAME
+      Type: "String" 
+      Value: !FindInMap [EC2Map, Ec2Name, !Ref Env] 
+
+  EC2KeyNameParameter: 
+    Type: "AWS::SSM::Parameter" 
+    Properties: 
+      Name: !Sub /${Env}/datafence/EC2/EC2_KEY_NAME
+      Type: "String" 
+      Value: !FindInMap [EC2Map, KeyName, !Ref Env] 
+
+  EC2TypeParameter: 
+    Type: "AWS::SSM::Parameter" 
+    Properties: 
+      Name: !Sub /${Env}/datafence/EC2/EC2_INSTANCE_TYPE
+      Type: "String" 
+      Value: !FindInMap [EC2Map, Ec2InstanceType, !Ref Env] 
+
+  EC2AMIIDParameter: 
+    Type: "AWS::SSM::Parameter" 
+    Properties: 
+      Name: !Sub /${Env}/datafence/EC2/EC2_AMI_ID
+      Type: "String" 
+      Value: !FindInMap [EC2Map, AMIID, !Ref Env] 
