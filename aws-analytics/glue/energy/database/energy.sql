@@ -26,8 +26,8 @@ CREATE TABLE `coal_prod` (
   `Entity` varchar(50) DEFAULT NULL,
   `Code` char(3) DEFAULT NULL,
   `Year` int(11) DEFAULT NULL,
-  `Production` float(10,2) DEFAULT NULL,
-  `consumption` float(10,2) DEFAULT NULL
+  `Production` decimal(10,2) DEFAULT NULL,
+  `consumption` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -52,9 +52,9 @@ CREATE TABLE `fossil_capita` (
   `Entity` varchar(50) DEFAULT NULL,
   `Code` char(3) DEFAULT NULL,
   `Year` int(11) DEFAULT NULL,
-  `Coal` float(10,2) DEFAULT NULL,
-  `Crude_oil` float(10,2) DEFAULT NULL,
-  `Natural_gas` float(10,2) DEFAULT NULL
+  `Coal` decimal(10,2) DEFAULT NULL,
+  `Crude_oil` decimal(10,2) DEFAULT NULL,
+  `Natural_gas` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -79,7 +79,7 @@ CREATE TABLE `gas_prod` (
   `Entity` varchar(50) DEFAULT NULL,
   `Code` char(3) DEFAULT NULL,
   `Year` int(11) DEFAULT NULL,
-  `Production` float(10,2) DEFAULT NULL
+  `Production` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -104,7 +104,7 @@ CREATE TABLE `oil_prod` (
   `Entity` varchar(50) DEFAULT NULL,
   `Code` char(3) DEFAULT NULL,
   `Year` int(11) DEFAULT NULL,
-  `Production` float(10,2) DEFAULT NULL
+  `Production` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
