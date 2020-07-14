@@ -291,6 +291,7 @@ JOB_LOG_DIR='log/'+JOB_NAME
 JOB_LOG_LOCATION='s3://'+LOG_BUCKET+'/'+JOB_LOG_DIR
 SNS_ARN='arn:aws:sns:us-east-1:175908995626:monitor-alert'
 TODAY = get_partition()
+UPDATED=datetime.datetime.today().replace(second=0, microsecond=0)
 
 # Variables for RAW Table Location on S3 and Glue Catalog Database
 CATALOG_DATABASE='non-renewable'
@@ -329,10 +330,11 @@ coal_prod_schema = StructType([StructField("Mode", StringType()),
                                ])
 
 coal_prod_df=spark.read.csv(RAW_TAB_LOCATION+'coal_prod/LOAD*.csv', header=False, schema=coal_prod_schema)
-coal_prod_df=coal_prod_df.withColumn('Updated', f.lit(TODAY))
+coal_prod_df=coal_prod_df.withColumn('Updated', f.lit(UPDATED))
 write_s3_file(coal_prod_df, CURATED_TAB_LOCATION, 'coal_prod', PARTITION, uid=None)
 append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'coal_prod') 
 print(s3pathlist)
+coal_prod_df.printSchema()
 coal_prod_df.show(5)
 
 fossil_capita_schema = StructType([StructField("Mode", StringType()),
@@ -345,7 +347,7 @@ fossil_capita_schema = StructType([StructField("Mode", StringType()),
                                ])
 
 fossil_capita_df=spark.read.csv(RAW_TAB_LOCATION+'fossil_capita/LOAD*.csv', header=False, schema=fossil_capita_schema)
-fossil_capita_df=fossil_capita_df.withColumn('Updated', f.lit(TODAY))
+fossil_capita_df=fossil_capita_df.withColumn('Updated', f.lit(UPDATED))
 write_s3_file(fossil_capita_df, CURATED_TAB_LOCATION, 'fossil_capita', PARTITION, uid=None)
 append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'fossil_capita') 
 print(s3pathlist)
@@ -359,7 +361,7 @@ gas_prod_schema = StructType([StructField("Mode", StringType()),
                                ])
 
 gas_prod_df=spark.read.csv(RAW_TAB_LOCATION+'gas_prod/LOAD*.csv', header=False, schema=gas_prod_schema)
-gas_prod_df=gas_prod_df.withColumn('Updated', f.lit(TODAY))
+gas_prod_df=gas_prod_df.withColumn('Updated', f.lit(UPDATED))
 write_s3_file(gas_prod_df, CURATED_TAB_LOCATION, 'gas_prod', PARTITION, uid=None)
 append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'gas_prod') 
 print(s3pathlist)
@@ -373,7 +375,7 @@ oil_prod_schema = StructType([StructField("Mode", StringType()),
                                ])
 
 oil_prod_df=spark.read.csv(RAW_TAB_LOCATION+'oil_prod/LOAD*.csv', header=False, schema=oil_prod_schema)
-oil_prod_df=oil_prod_df.withColumn('Updated', f.lit(TODAY))
+oil_prod_df=oil_prod_df.withColumn('Updated', f.lit(UPDATED))
 write_s3_file(oil_prod_df, CURATED_TAB_LOCATION, 'oil_prod', PARTITION, uid=None)
 append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'oil_prod') 
 print(s3pathlist)
@@ -396,3 +398,5 @@ except Exception as e:
     else:
         delete_crawler(client, CRAWLER_NAME)
         handle_error(spark, log, e, REGION_NAME, LOG_BUCKET, JOB_LOG_DIR+'/'+UID, JOB_LOG_LOCATION, PARTITION, SNS_ARN)
+
+
