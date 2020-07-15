@@ -20,8 +20,9 @@ import logging
 import calendar
 import uuid
 import time
-from dateutil import relativedelta
 from datetime import timedelta
+from dateutil import relativedelta
+import botocore
 
 def get_partition():
     return str(datetime.datetime.now().date())
@@ -129,7 +130,7 @@ def write_s3_file(df, table_location, table, partition=None, uid=None, format='P
     try:
         if format == 'PARQUET':
             if uid is None:
-                df.write.parquet(table_location+'/'+table+'/'+partition)
+                df.write.mode('append').parquet(table_location+'/'+table+'/'+partition)
             else:
                 df.write.parquet(table_location+'/'+table+'/'+uid+'/'+partition)
         if format == 'CSV':
@@ -262,6 +263,17 @@ def job_notification_sns(region_name, log_bucket, job_log_dir, partition, sns_ar
     s3r = boto3.resource('s3' , region_name=region_name)
 
     response = s3.list_objects(Bucket = log_bucket, Prefix = job_log_dir+'/'+partition)
+    
+
+def does_s3key_exist(bucket, key, ext):
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(bucket)
+    objects = bucket.objects.all()
+    FOUND=0
+    for object in objects:
+        if object.key.startswith(key) and object.key.endswith(ext):
+            FOUND=1
+    return FOUND
 
 
 # -------------------------------------------------------------------------
@@ -283,18 +295,17 @@ else:
     print(args)
     JOB_DATE=args.JOB_DATE
 
+
 # -------------------------------------------------------------------------
 # MODIFY AS PER JOB
 #    These are the variables that drive the whole job.
 #    Modify each variable for each job accordingly.
 # -------------------------------------------------------------------------
 
-# Variables for GLue Tables
+# Variables for Glue Tables
 JOB_NAME='non-renewable'
 REGION_NAME='us-east-1'
 UID=uuid.uuid4().hex
-LAST_DAY = datetime.datetime.strptime(JOB_DATE, '%Y-%m-%d').date() - timedelta(days=1)
-PARTITION='dt='+str(LAST_DAY)
 
 # Variables for Job Log
 LOG_BUCKET='aws-analytics-course'
@@ -304,11 +315,18 @@ SNS_ARN='arn:aws:sns:us-east-1:175908995626:monitor-alert'
 TODAY = get_partition()
 UPDATED=datetime.datetime.today().replace(second=0, microsecond=0)
 
+#INCRFILE_PREFIX=datetime.date.today().strftime('%Y')+datetime.date.today().strftime('%m')+str((int(datetime.date.today().strftime('%d'))))
+LAST_DAY = datetime.datetime.strptime(JOB_DATE, '%Y-%m-%d').date() - timedelta(days=1)
+PARTITION='dt='+str(LAST_DAY)
+INCRFILE_PREFIX=str(LAST_DAY.strftime('%Y')+LAST_DAY.strftime('%m')+LAST_DAY.strftime('%d'))
+#print(INCRFILE_PREFIX)
+
 # Variables for RAW Table Location on S3 and Glue Catalog Database
 CATALOG_DATABASE='non-renewable'
 RAW_DATABASE='non-renewable'
 RAW_BUCKET='aws-analytics-course'
-RAW_TAB_LOCATION='s3://'+RAW_BUCKET+'/'+'raw/dms/fossil/'
+RAW_SUFFIX='raw/dms/fossil/'
+RAW_TAB_LOCATION='s3://'+RAW_BUCKET+'/'+RAW_SUFFIX+'/'
 
 # Variables for Curated Table Location on S3 and Glue Catalog Database
 CURATED_BUCKET='aws-analytics-course'
@@ -331,6 +349,7 @@ if not INTERACTIVE:
     spark = glueContext.spark_session
     
 client = boto3.client('glue', region_name=REGION_NAME)
+s3 = boto3.client('s3', region_name=REGION_NAME)
 
 coal_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
@@ -339,14 +358,13 @@ coal_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Production", DecimalType()),
                                StructField("Consumption", DecimalType())
                                ])
-
-coal_prod_df=spark.read.csv(RAW_TAB_LOCATION+'coal_prod/LOAD*.csv', header=False, schema=coal_prod_schema)
-coal_prod_df=coal_prod_df.withColumn('Updated', f.lit(UPDATED))
-write_s3_file(coal_prod_df, CURATED_TAB_LOCATION, 'coal_prod', PARTITION, uid=None)
-append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'coal_prod') 
-print(s3pathlist)
-coal_prod_df.printSchema()
-coal_prod_df.show(5)
+if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'coal_prod/'+INCRFILE_PREFIX, '.csv') == 1:
+    coal_prod_df=spark.read.csv(RAW_TAB_LOCATION+'coal_prod/'+INCRFILE_PREFIX+'*.csv', header=False, schema=coal_prod_schema)
+    coal_prod_df=coal_prod_df.withColumn('Updated', f.lit(UPDATED))
+    write_s3_file(coal_prod_df, CURATED_TAB_LOCATION, 'coal_prod', PARTITION, uid=None)
+    append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'coal_prod') 
+    #print(s3pathlist)
+    #coal_prod_df.show(5)
 
 fossil_capita_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
@@ -357,12 +375,13 @@ fossil_capita_schema = StructType([StructField("Mode", StringType()),
                                StructField("Natural_gas", DecimalType())
                                ])
 
-fossil_capita_df=spark.read.csv(RAW_TAB_LOCATION+'fossil_capita/LOAD*.csv', header=False, schema=fossil_capita_schema)
-fossil_capita_df=fossil_capita_df.withColumn('Updated', f.lit(UPDATED))
-write_s3_file(fossil_capita_df, CURATED_TAB_LOCATION, 'fossil_capita', PARTITION, uid=None)
-append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'fossil_capita') 
-print(s3pathlist)
-fossil_capita_df.show(5)
+if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'fossil_capita/'+INCRFILE_PREFIX, '.csv') == 1:
+    fossil_capita_df=spark.read.csv(RAW_TAB_LOCATION+'fossil_capita/'+INCRFILE_PREFIX+'*.csv', header=False, schema=fossil_capita_schema)
+    fossil_capita_df=fossil_capita_df.withColumn('Updated', f.lit(UPDATED))
+    write_s3_file(fossil_capita_df, CURATED_TAB_LOCATION, 'fossil_capita', PARTITION, uid=None)
+    append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'fossil_capita') 
+    #print(s3pathlist)
+    #fossil_capita_df.show(5)
 
 gas_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
@@ -371,12 +390,13 @@ gas_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Production", DecimalType())
                                ])
 
-gas_prod_df=spark.read.csv(RAW_TAB_LOCATION+'gas_prod/LOAD*.csv', header=False, schema=gas_prod_schema)
-gas_prod_df=gas_prod_df.withColumn('Updated', f.lit(UPDATED))
-write_s3_file(gas_prod_df, CURATED_TAB_LOCATION, 'gas_prod', PARTITION, uid=None)
-append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'gas_prod') 
-print(s3pathlist)
-gas_prod_df.show(5)
+if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'gas_prod/'+INCRFILE_PREFIX, '.csv') == 1:
+    gas_prod_df=spark.read.csv(RAW_TAB_LOCATION+'gas_prod/'+INCRFILE_PREFIX+'*.csv', header=False, schema=gas_prod_schema)
+    gas_prod_df=gas_prod_df.withColumn('Updated', f.lit(UPDATED))
+    write_s3_file(gas_prod_df, CURATED_TAB_LOCATION, 'gas_prod', PARTITION, uid=None)
+    append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'gas_prod') 
+    #print(s3pathlist)
+    #gas_prod_df.show(5)
 
 oil_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
@@ -385,12 +405,13 @@ oil_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Production", DecimalType())
                                ])
 
-oil_prod_df=spark.read.csv(RAW_TAB_LOCATION+'oil_prod/LOAD*.csv', header=False, schema=oil_prod_schema)
-oil_prod_df=oil_prod_df.withColumn('Updated', f.lit(UPDATED))
-write_s3_file(oil_prod_df, CURATED_TAB_LOCATION, 'oil_prod', PARTITION, uid=None)
-append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'oil_prod') 
-print(s3pathlist)
-oil_prod_df.show(5)
+if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'oil_prod/'+INCRFILE_PREFIX, '.csv') == 1:
+    oil_prod_df=spark.read.csv(RAW_TAB_LOCATION+'oil_prod/'+INCRFILE_PREFIX+'*.csv', header=False, schema=oil_prod_schema)
+    oil_prod_df=oil_prod_df.withColumn('Updated', f.lit(UPDATED))
+    write_s3_file(oil_prod_df, CURATED_TAB_LOCATION, 'oil_prod', PARTITION, uid=None)
+    append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'oil_prod') 
+    #print(s3pathlist)
+    #oil_prod_df.show(5)
 
 # -------------------------------------------------------------------------
 # Crawl tables
