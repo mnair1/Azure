@@ -8,6 +8,7 @@ from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
+from pyspark.sql.session import SparkSession
 from awsglue.job import Job
 from pyspark.sql import functions as f
 from pyspark.sql.types import *
@@ -278,11 +279,8 @@ DEBUG=True
 if INTERACTIVE:
     JOB_DATE='2020-07-14'
 else:
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--JOB_DATE', dest='JOB_DATE')
-    args = parser.parse_args()
-    print(args)
-    JOB_DATE=args.JOB_DATE
+    args = getResolvedOptions(sys.argv, ['JOB_DATE'])
+    JOB_DATE=args['JOB_DATE']
 
 # -------------------------------------------------------------------------
 # MODIFY AS PER JOB
@@ -329,7 +327,7 @@ log = []
 s3pathlist=[]
 
 if not INTERACTIVE:
-    spark = glueContext.spark_session
+    spark = SparkSession(sc)
     
 client = boto3.client('glue', region_name=REGION_NAME)
 
