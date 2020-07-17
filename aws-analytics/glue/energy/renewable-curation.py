@@ -4,11 +4,8 @@
 # -------------------------------------------------------------------------
 
 import sys
-from awsglue.transforms import *
-from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
-from awsglue.context import GlueContext
-from awsglue.job import Job
+from pyspark.sql.session import SparkSession
 from pyspark.sql import functions as f
 from pyspark.sql.types import *
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, array, ArrayType, DateType
@@ -78,7 +75,7 @@ def read_table_from_catalog(glueContext, database, table_name):
         glueContext: GlueContext class object.
         database: Glue catalog database name.
         table_name: Glue catalog table name.
-    
+
     Returns:
         spark.sql.dataframe: Returns a object of Spark Dataframe containing data of the table coming from Glue catalog.
     '''
@@ -112,7 +109,7 @@ def read_s3_file(spark, type, path, delimiter='|', header='true', rowTag='placeh
         return spark.read.format('com.databricks.spark.xml').option('rowTag', rowTag).load(path)
     if (type == 'PARQUET'):
         return spark.read.parquet(path)
-    
+
 def write_s3_file(df, table_location, table, partition=None, uid=None, format='PARQUET', delimiter='\t', coalesce=1, header=False):
     '''
     function: write_s3_file
@@ -146,61 +143,61 @@ def write_s3_file(df, table_location, table, partition=None, uid=None, format='P
 
 def append_path_to_list(list, location, table_name):
     list.append({'Path': location + '/' + table_name})
-    
+
 def update_crawler(client, crawler_name, s3targets):
     client.update_crawler(
         Name=crawler_name,
         Targets = {'S3Targets':s3targets}
-            
+
     )
-    
+
 def start_crawler(client, crawler_name):
     print(crawler_name + ' started.')
-    
+
     # Getting PRE-RUN READY status.
     while(True):
         time.sleep(1)
         response = client.get_crawler(
                         Name=crawler_name
                    )
-        
+
         if response['Crawler']['State'] == 'READY':
             print(response['Crawler']['State'])
             break
-            
+
     client.start_crawler(
         Name=crawler_name
     )
-    
-    # Getting RUNNING status for stdout.            
+
+    # Getting RUNNING status for stdout.
     while(True):
         time.sleep(15)
         response = client.get_crawler(
                         Name=crawler_name
                    )
-        
+
         if response['Crawler']['State'] == 'RUNNING':
             print(response['Crawler']['State'])
             break
-        
+
     # Getting STOPPING status for stdout.
     while(True):
         time.sleep(1)
         response = client.get_crawler(
                         Name=crawler_name
                    )
-        
+
         if response['Crawler']['State'] == 'STOPPING':
             print(response['Crawler']['State'])
             break
-    
+
    # Getting READY status.
     while(True):
         time.sleep(1)
         response = client.get_crawler(
                         Name=crawler_name
                    )
-        
+
         if response['Crawler']['State'] == 'READY':
             print(response['Crawler']['State'])
             break
@@ -212,15 +209,15 @@ def delete_crawler(client, crawler_name):
         response = client.get_crawler(
                         Name=crawler_name
                    )
-        
+
         if response['Crawler']['State'] == 'READY':
             print(response['Crawler']['State'])
             break
-    
+
     client.delete_crawler(
         Name=crawler_name
     )
-    
+
     print(crawler_name + ' deleted.')
 
 def append_log(log, logdate, id, message):
@@ -273,7 +270,7 @@ def job_notification_sns(region_name, log_bucket, job_log_dir, partition, sns_ar
 # -------------------------------------------------------------------------
 
 INTERACTIVE=False
-DEBUG=True  
+DEBUG=True
 
 if INTERACTIVE:
     JOB_DATE='2020-07-16'
@@ -316,13 +313,12 @@ CRAWLER_ARN='arn:aws:iam::175908995626:role/glue-role'
 # -------------------------------------------------------------------------
 
 sc = SparkContext.getOrCreate()
-glueContext = GlueContext(sc)
 log = []
 s3pathlist=[]
 
 if not INTERACTIVE:
-    spark = glueContext.spark_session
-    
+    spark = SparkSession(sc)
+
 client = boto3.client('glue', region_name=REGION_NAME)
 
 hydropower_consumption_df=spark.read.csv(RAW_TAB_LOCATION+'hydropower-consumption/'+get_partition(), header=True)
@@ -332,7 +328,7 @@ hydropower_consumption_df=hydropower_consumption_df.withColumnRenamed("Hydropowe
                                                    .withColumn('consumption', f.col('consumption').cast(FloatType()))
 
 write_s3_file(hydropower_consumption_df, CURATED_TAB_LOCATION, 'hydropower_consumption', PARTITION, uid=None)
-append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'hydropower_consumption') 
+append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'hydropower_consumption')
 #print(s3pathlist)
 #hydropower_consumption_df.printSchema()
 #hydropower_consumption_df.show(5)
@@ -350,39 +346,39 @@ renewable_energy_consumption_df=renewable_energy_consumption_df \
           .withColumn('Other_renewables', f.col('Other_renewables').cast(FloatType())) \
           .withColumn('Wind', f.col('Wind').cast(FloatType())) \
           .withColumn('Solar', f.col('Solar').cast(FloatType())) \
-          .withColumn('Hydropower', f.col('Hydropower').cast(FloatType())) 
+          .withColumn('Hydropower', f.col('Hydropower').cast(FloatType()))
 
 write_s3_file(renewable_energy_consumption_df, CURATED_TAB_LOCATION, 'renewable_energy_consumption', PARTITION, uid=None)
-append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'renewable_energy_consumption') 
-#print(s3pathlist)
-#renewable_energy_consumption_df.printSchema()
-#renewable_energy_consumption_df.show(5)
+append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'renewable_energy_consumption')
+print(s3pathlist)
+renewable_energy_consumption_df.printSchema()
+renewable_energy_consumption_df.show(5)
 
 solar_energy_consumption_df=spark.read.csv(RAW_TAB_LOCATION+'solar-energy-consumption/'+get_partition(), header=True)
 
 solar_energy_consumption_df=solar_energy_consumption_df \
           .withColumnRenamed("Solar PV Consumption (Terawatt-hours)",'consumption') \
           .withColumn('Year', f.col('Year').cast(IntegerType())) \
-          .withColumn('consumption', f.col('consumption').cast(FloatType())) 
+          .withColumn('consumption', f.col('consumption').cast(FloatType()))
 
 write_s3_file(solar_energy_consumption_df, CURATED_TAB_LOCATION, 'solar_energy_consumption', PARTITION, uid=None)
-append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'solar_energy_consumption') 
-#print(s3pathlist)
-#solar_energy_consumption_df.printSchema()
-#solar_energy_consumption_df.show(5)
+append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'solar_energy_consumption')
+print(s3pathlist)
+solar_energy_consumption_df.printSchema()
+solar_energy_consumption_df.show(5)
 
 wind_energy_consumption_df=spark.read.csv(RAW_TAB_LOCATION+'wind-energy-consumption-terawatt-hours-twh/'+get_partition(), header=True)
 
 wind_energy_consumption_df=wind_energy_consumption_df \
           .withColumnRenamed("Wind energy consumption (Terawatt-hours)",'consumption') \
           .withColumn('Year', f.col('Year').cast(IntegerType())) \
-          .withColumn('consumption', f.col('consumption').cast(FloatType())) 
+          .withColumn('consumption', f.col('consumption').cast(FloatType()))
 
 write_s3_file(wind_energy_consumption_df, CURATED_TAB_LOCATION, 'wind_energy_consumption', PARTITION, uid=None)
-append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'wind_energy_consumption') 
-#print(s3pathlist)
-#wind_energy_consumption_df.printSchema()
-#wind_energy_consumption_df.show(5)
+append_path_to_list(s3pathlist, CURATED_TAB_LOCATION, 'wind_energy_consumption')
+print(s3pathlist)
+wind_energy_consumption_df.printSchema()
+wind_energy_consumption_df.show(5)
 
 # -------------------------------------------------------------------------
 # Crawl tables
