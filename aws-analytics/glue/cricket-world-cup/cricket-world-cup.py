@@ -36,7 +36,7 @@ from awsglue.utils import getResolvedOptions
 
 # Edit Variables below as per AWS account
 
-INTERACTIVE=True
+INTERACTIVE=False
 DEBUG=True  
 
 if INTERACTIVE:
