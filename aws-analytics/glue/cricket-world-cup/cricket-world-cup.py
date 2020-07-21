@@ -15,6 +15,8 @@ from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql.session import SparkSession
+from pyspark.sql import SQLContext
+from pyspark.sql import HiveContext
 from awsglue.job import Job
 from pyspark.sql import functions as f
 from pyspark.sql.types import *
@@ -73,7 +75,7 @@ log = []
 s3pathlist=[]
 
 if not INTERACTIVE:
-    spark = SparkSession(sc)
+    spark = glueContext.spark_session
     
 client = boto3.client('glue', region_name=REGION_NAME)
 
@@ -375,7 +377,7 @@ bowler_df.filter(bowler_df.Player_ID == 28081).count()
 
 
 # Filtering using Spark SQL commands
-sqlContext.sql("SELECT * FROM bowlers where Player_ID = 28081").count()
+spark.sql("SELECT * FROM bowlers where Player_ID = 28081").count()
 
 
 # In[ ]:
