@@ -14,6 +14,7 @@ from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
+from pyspark.sql.session import SparkSession
 from awsglue.job import Job
 from pyspark.sql import functions as f
 from pyspark.sql.types import *
@@ -72,7 +73,7 @@ log = []
 s3pathlist=[]
 
 if not INTERACTIVE:
-    spark = glueContext.spark_session(sc)
+    spark = SparkSession(sc)
     
 client = boto3.client('glue', region_name=REGION_NAME)
 
