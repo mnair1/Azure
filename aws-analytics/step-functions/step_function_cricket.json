@@ -2,7 +2,7 @@
   "Comment": "Glue Job using a Task state.",
   "StartAt": "cricket-world-cup",
   "Version": "1.0",
-  "TimeoutSeconds": 300,
+  "TimeoutSeconds": 3000,
   "States": {
     "cricket-world-cup": {
       "Type": "Task",
