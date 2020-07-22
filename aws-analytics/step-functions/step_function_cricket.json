@@ -1,0 +1,19 @@
+{
+  "Comment": "Glue Job using a Task state.",
+  "StartAt": "cricket-world-cup",
+  "Version": "1.0",
+  "TimeoutSeconds": 300,
+  "States": {
+    "cricket-world-cup": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "cricket-world-cup",
+        "Arguments": {
+          "--JOB_DATE": "20200707"
+        }
+      },
+      "End": true
+    }
+  }
+}
