@@ -16,7 +16,7 @@ def put_to_stream(city, temp, sensor_timestamp):
                 'city': city
               }
 
-    print json.dumps(payload)
+    print(json.dumps(payload))
 
     put_response = kinesis_client.put_record(
                         StreamName=stream_name,
