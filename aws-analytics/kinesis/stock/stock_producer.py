@@ -16,7 +16,7 @@ def put_to_stream(symbol, price, ticker_timestamp):
                 'timestamp': str(ticker_timestamp)
               }
 
-    print payload
+    print(payload)
 
     put_response = kinesis_client.put_record(
                         StreamName=stream_name,
