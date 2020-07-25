@@ -16,7 +16,7 @@ def put_to_stream(sensor_id, temp, sensor_timestamp):
                 'sensor_id': sensor_id
               }
 
-    print payload
+    print(payload)
 
     put_response = kinesis_client.put_record(
                         StreamName=stream_name,
