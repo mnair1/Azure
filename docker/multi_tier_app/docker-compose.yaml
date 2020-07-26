@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+
+  frontend:
+    build: ./front_end
+    image: frontend:latest
+    container_name: frontend
+    networks:
+     - mt-bridge
+    ports:
+      - "3000:3000"
+
+  backend:
+    build: ./backend
+    image: backend:latest
+    container_name: backend
+    networks:
+     - mt-bridge
+    # ports:
+      # - "5000:5000"
+
+  mongocontainer:
+    image: mongo
+    container_name: mongocontainer
+    networks:
+     - mt-bridge
+    # ports:
+      # - "27017:27017"
+    volumes:
+      - type: volume
+        source: mongo-volume
+        target: /data/db
+
+volumes:
+  mongo-volume:
+    name: mongo-volume
+
+networks:
+  mt-bridge:
+    name: multi-tier-bridge
