@@ -5,7 +5,6 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY app/package.json /usr/src/app
-# COPY app/.env.development /usr/src/app
 
 RUN npm install
 
