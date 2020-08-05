@@ -396,6 +396,6 @@ except Exception as e:
         raise e
     else:
         delete_crawler(client, CRAWLER_NAME)
-        handle_error(spark, log, e, REGION_NAME, LOG_BUCKET, JOB_LOG_DIR+'/'+UID, JOB_LOG_LOCATION, PARTITION, SNS_ARN)
+        raise e
 
 
