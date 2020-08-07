@@ -291,7 +291,7 @@ else:
 JOB_NAME='renewable-curation'
 REGION_NAME='us-east-1'
 UID=uuid.uuid4().hex
-PARTITION='dt='+get_partition()
+PARTITION='dt='+JOB_DATE
 
 
 # Variables for RAW Table Location on S3 and Glue Catalog Database
