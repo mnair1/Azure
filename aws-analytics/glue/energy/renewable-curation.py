@@ -82,6 +82,17 @@ def write_s3_file(df, table_location, table, partition=None, uid=None, format='P
 def append_path_to_list(list, location, table_name):
     list.append({'Path': location + '/' + table_name})
     
+def create_crawler(client, crawler_name, iam_role_arn, database_name):
+    return client.create_crawler(
+        Name=crawler_name,
+        Role=iam_role_arn,
+        DatabaseName=database_name,
+        Targets={
+            'S3Targets':[
+                {'Path':'s3://bucket/placeholder'}
+            ]}
+        )
+
 def update_crawler(client, crawler_name, s3targets):
     client.update_crawler(
         Name=crawler_name,
