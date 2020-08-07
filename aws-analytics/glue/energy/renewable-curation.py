@@ -278,7 +278,7 @@ CRAWLER_ARN='arn:aws:iam::175908995626:role/glue-role'
 # -------------------------------------------------------------------------
 
 sc = SparkContext.getOrCreate()
-glueContext = GlueContext(sc)
+
 log = []
 s3pathlist=[]
 
