@@ -16,6 +16,6 @@ record_response = kinesis_client.get_records(ShardIterator=shard_iterator,
 while 'NextShardIterator' in record_response:
     record_response = kinesis_client.get_records(ShardIterator=record_response['NextShardIterator'],
                                                   Limit=2)
-    print record_response
+    print(record_response)
     # wait for 5 seconds
     time.sleep(5)

@@ -12,7 +12,7 @@ from pyspark.sql.session import SparkSession
 from awsglue.job import Job
 from pyspark.sql import functions as f
 from pyspark.sql.types import *
-from pyspark.sql.types import StructType, StructField, IntegerType, StringType, array, ArrayType, DateType
+from pyspark.sql.types import StructType, StructField, FloatType, IntegerType, StringType, array, ArrayType, DateType
 from pyspark.sql import Row, Column
 import datetime
 import json
@@ -354,8 +354,8 @@ coal_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Production", DecimalType()),
-                               StructField("Consumption", DecimalType())
+                               StructField("Production", FloatType()),
+                               StructField("Consumption", FloatType())
                                ])
 if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'coal_prod/'+INCRFILE_PREFIX, '.csv') == 1:
     coal_prod_df=spark.read.csv(RAW_TAB_LOCATION+'coal_prod/'+INCRFILE_PREFIX+'*.csv', header=False, schema=coal_prod_schema)
@@ -369,9 +369,9 @@ fossil_capita_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Coal", DecimalType()),
-                               StructField("Crude_oil", DecimalType()),
-                               StructField("Natural_gas", DecimalType())
+                               StructField("Coal", FloatType()),
+                               StructField("Crude_oil", FloatType()),
+                               StructField("Natural_gas", FloatType())
                                ])
 
 if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'fossil_capita/'+INCRFILE_PREFIX, '.csv') == 1:
@@ -386,7 +386,7 @@ gas_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Production", DecimalType())
+                               StructField("Production", FloatType())
                                ])
 
 if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'gas_prod/'+INCRFILE_PREFIX, '.csv') == 1:
@@ -401,7 +401,7 @@ oil_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Production", DecimalType())
+                               StructField("Production", FloatType())
                                ])
 
 if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'oil_prod/'+INCRFILE_PREFIX, '.csv') == 1:
@@ -428,6 +428,6 @@ except Exception as e:
         raise e
     else:
         delete_crawler(client, CRAWLER_NAME)
-        handle_error(spark, log, e, REGION_NAME, LOG_BUCKET, JOB_LOG_DIR+'/'+UID, JOB_LOG_LOCATION, PARTITION, SNS_ARN)
+        
 
 

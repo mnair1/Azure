@@ -9,7 +9,7 @@
      "--deploy-mode", "cluster",
      "s3://aws-analytics-course/job/energy/renewable-curation.py", 
 	 "--JOB_DATE", 
-	 "20190823"
+	 "2019-08-23"
    ]
  }
 ]
