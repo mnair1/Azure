@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: devops-datafence-service-clusterip
+  labels:
+    name: df-svc-ci
+spec:
+  type: ClusterIP
+  ports:
+    - targetPort: 80
+      port: 12140
+  selector:
+    app: df-pod-backend
+
+    
