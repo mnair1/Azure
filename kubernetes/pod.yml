@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: devops-datafence-pod
+  labels:
+    app: df-pod
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
