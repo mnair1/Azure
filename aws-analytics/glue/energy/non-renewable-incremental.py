@@ -68,7 +68,12 @@ def create_crawler(client, crawler_name, iam_role_arn, database_name):
         Targets={
             'S3Targets':[
                 {'Path':'s3://bucket/placeholder'}
-            ]}
+            ]},
+        SchemaChangePolicy={
+            "UpdateBehavior": "LOG",
+            "DeleteBehavior": "DEPRECATE_IN_DATABASE"
+        },
+        Configuration="{\"Version\":1.0,\"CrawlerOutput\":{\"Partitions\":{\"AddOrUpdateBehavior\":\"InheritFromTable\"}},\"Grouping\":{\"TableGroupingPolicy\":\"CombineCompatibleSchemas\"}}"
         )
 
 def read_table_from_catalog(glueContext, database, table_name):
