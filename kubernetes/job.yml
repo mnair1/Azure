@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: devops-datafence-job
+  labels:
+    name: df-job
+spec:
+  completions: 3
+  parallelism: 3
+  template:
+    spec:
+      containers:
+        - name: df-job
+          image: kodekloud/random-error
+      restartPolicy: Never

@@ -1,0 +1,19 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: devops-datafence-cron-job
+  labels:
+    name: df-cron-job
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      completions: 1
+      template:
+        spec:
+          containers:
+            - name: df-cron-job
+              image: ubuntu
+          restartPolicy: Never
+
+          

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-datafence-deployment
+  labels:
+    name: df-depl
+spec:
+  template:
+    metadata:
+      name: devops-datafence-pod-rs
+      labels:
+        app: df-pod
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx:1.7.1
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: 0.2
+  replicas: 2
+  selector:
+    matchLabels:
+      app: df-pod
+
+      

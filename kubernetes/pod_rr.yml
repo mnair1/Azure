@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: devops-datafence-pod-rr
+  labels:
+    app: df-pod
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: 1
