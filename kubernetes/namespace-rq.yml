@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: df-ns-quota
-  namespace: datafence-dev
+  namespace: devops-df-dev
 spec:
   hard:
     pods: "6"
