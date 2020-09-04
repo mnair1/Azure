@@ -15,7 +15,7 @@ def put_to_table(sensor_id, temp, sensor_timestamp):
                 'sensor_id': sensor_id
               }
 
-    print payload
+    print(payload)
 
     table = dynamodb.Table('Temperature')
     response = table.put_item(

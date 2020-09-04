@@ -359,8 +359,8 @@ coal_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Production", FloatType()),
-                               StructField("Consumption", FloatType())
+                               StructField("Production", DecimalType(10,2)),
+                               StructField("Consumption", DecimalType(10,2))
                                ])
 if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'coal_prod/'+INCRFILE_PREFIX, '.csv') == 1:
     coal_prod_df=spark.read.csv(RAW_TAB_LOCATION+'coal_prod/'+INCRFILE_PREFIX+'*.csv', header=False, schema=coal_prod_schema)
@@ -374,9 +374,9 @@ fossil_capita_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Coal", FloatType()),
-                               StructField("Crude_oil", FloatType()),
-                               StructField("Natural_gas", FloatType())
+                               StructField("Coal", DecimalType(10,2)),
+                               StructField("Crude_oil", DecimalType(10,2)),
+                               StructField("Natural_gas", DecimalType(10,2))
                                ])
 
 if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'fossil_capita/'+INCRFILE_PREFIX, '.csv') == 1:
@@ -391,7 +391,7 @@ gas_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Production", FloatType())
+                               StructField("Production", DecimalType(10,2))
                                ])
 
 if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'gas_prod/'+INCRFILE_PREFIX, '.csv') == 1:
@@ -406,7 +406,7 @@ oil_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Production", FloatType())
+                               StructField("Production", DecimalType(10,2))
                                ])
 
 if does_s3key_exist(RAW_BUCKET, RAW_SUFFIX+'oil_prod/'+INCRFILE_PREFIX, '.csv') == 1:
