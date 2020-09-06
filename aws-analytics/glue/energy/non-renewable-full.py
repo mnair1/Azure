@@ -335,8 +335,8 @@ coal_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Production", DecimalType()),
-                               StructField("Consumption", DecimalType())
+                               StructField("Production", DecimalType(10,2)),
+                               StructField("Consumption", DecimalType(10,2))
                                ])
 
 coal_prod_df=spark.read.csv(RAW_TAB_LOCATION+'coal_prod/LOAD*.csv', header=False, schema=coal_prod_schema)
@@ -351,9 +351,9 @@ fossil_capita_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Coal", DecimalType()),
-                               StructField("Crude_oil", DecimalType()),
-                               StructField("Natural_gas", DecimalType())
+                               StructField("Coal", DecimalType(10,2)),
+                               StructField("Crude_oil", DecimalType(10,2)),
+                               StructField("Natural_gas", DecimalType(10,2))
                                ])
 
 fossil_capita_df=spark.read.csv(RAW_TAB_LOCATION+'fossil_capita/LOAD*.csv', header=False, schema=fossil_capita_schema)
@@ -367,7 +367,7 @@ gas_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Production", DecimalType())
+                               StructField("Production", DecimalType(10,2))
                                ])
 
 gas_prod_df=spark.read.csv(RAW_TAB_LOCATION+'gas_prod/LOAD*.csv', header=False, schema=gas_prod_schema)
@@ -381,7 +381,7 @@ oil_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
                                StructField("Code", StringType()),
                                StructField("Year", IntegerType()),
-                               StructField("Production", DecimalType())
+                               StructField("Production", DecimalType(10,2))
                                ])
 
 oil_prod_df=spark.read.csv(RAW_TAB_LOCATION+'oil_prod/LOAD*.csv', header=False, schema=oil_prod_schema)
