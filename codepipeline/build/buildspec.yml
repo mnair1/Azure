@@ -30,7 +30,7 @@ phases:
       - sed -i "s/<MONGO_DB>/$MONGO_DB/g" mongo.py
       - sed -i "s/<MONGO_HOST>/$MONGO_HOST/g" mongo.py
       - sed -i "s/<MONGO_PORT>/$MONGO_PORT/g" mongo.py
-      - cat mongo.py
+      # - cat mongo.py
 
       - echo "Existing Package.json"
       - cat package.json
@@ -54,6 +54,8 @@ phases:
       - echo "Compressing the artifacts"
       - zip -r devops-df-build-artifact.zip .
       - ls
+      - cat mongo.py
+      - cat package.json
       - cd ../../
       - cp codepipeline/multi-tier-app/devops-df-build-artifact.zip .
 
