@@ -20,18 +20,24 @@ phases:
       nodejs: 10
   pre_build:
     commands:
-      - echo "list the directory"
+      - echo "Node Version"
       - npm --version
-      - cd codepipeline
+      - echo "list the directory"
+      - ls
   build:
     commands:
-      - cd multi-tier-app
+      - cd codepipeline/multi-tier-app
+      - echo "list multi tier app directory"
       - ls
-      - echo "build started at `date`"
+      - echo "Build Started at `date`"
       - npm install
+      - echo "Build Completed at `date`"
   post_build:
     commands:
-      - zip -rf code_artifact.zip .
+      - echo "list the content after build"
+      - ls
+      - echo "Compressing the artifact"
+      - zip -r code_artifact.zip .
       - cp code_artifact.zip $CODEBUILD_SRC_DIR/
       - ls $CODEBUILD_SRC_DIR
 artifacts:
