@@ -54,11 +54,13 @@ phases:
       - echo "Compressing the artifacts"
       - zip -r devops-df-build-artifact.zip .
       - ls
+      - cd ../../
+      - cp codepipeline/multi-tier-app/devops-df-build-artifact.zip .
 
 artifacts:
   files:
     # - '**/*'
-    - $CODEBUILD_SRC_DIR/codepipeline/multi-tier-app/devops-df-build-artifact.zip
+    - devops-df-build-artifact.zip
   name: build-artifact
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
