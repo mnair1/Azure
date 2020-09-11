@@ -10,10 +10,6 @@ version: 0.2
   #secrets-manager:
      # key: secret-id:json-key:version-stage:version-id
      # key: secret-id:json-key:version-stage:version-id
-  #exported-variables:
-     # - variable
-     # - variable
-  #git-credential-helper: yes
 phases:
   install:
     runtime-versions:
@@ -24,27 +20,39 @@ phases:
       - npm --version
       - echo "list the directory"
       - ls
-  build:
-    commands:
       - cd codepipeline/multi-tier-app
       - echo "list multi tier app directory"
       - ls
+
+      - cat package.json
+      - echo "Updating NodeJs config with Specs"
+      - sed -i "s/<VERSION_AXIOS>/$VERSION_AXIOS/g" package.json
+      - sed -i "s/<VERSION_REACT>/$VERSION_REACT/g" package.json
+      - sed -i "s/<VERSION_REACT_DOM>/$VERSION_REACT_DOM/g" package.json
+      - sed -i "s/<VERSION_REACT_SCRIPTS>/$VERSION_REACT_SCRIPTS/g" package.json
+      - sed -i "s/<NODEJS_HOST>/$NODEJS_HOST/g" package.json
+      - sed -i "s/<NODEJS_PORT>/$NODEJS_PORT/g" package.json
+      - cat package.json
+
+  build:
+    commands:
       - echo "Build Started at `date`"
       - npm install
       - echo "Build Completed at `date`"
   post_build:
     commands:
-      - echo "list the content after build"
-      - ls
-      - echo "Compressing the artifact"
-      - zip -r code_artifact.zip .
-      - cp code_artifact.zip $CODEBUILD_SRC_DIR/
-      - ls $CODEBUILD_SRC_DIR
+      - echo "Existing Python code"
+      - cat mongo.py
+      - echo "Updating Python Code with Specs"
+      - sed -i "s/<MONGO_DB>/$MONGO_DB/g" mongo.py
+      - sed -i "s/<MONGO_HOST>/$MONGO_HOST/g" mongo.py
+      - sed -i "s/<MONGO_PORT>/$MONGO_PORT/g" mongo.py
+      - cat mongo.py
 artifacts:
   files:
     # - '**/*'
     - $CODEBUILD_SRC_DIR/codepipeline/multi-tier-app/**/*  
-  name: devops-df-build-artifact-$(date +%Y-%m-%d)
+  name: devops-df-build-artifact
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
   #base-directory: location
