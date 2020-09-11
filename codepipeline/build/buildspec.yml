@@ -50,8 +50,8 @@ phases:
       - cat mongo.py
 artifacts:
   files:
-    # - '**/*'
-    - $CODEBUILD_SRC_DIR/codepipeline/multi-tier-app/**/*  
+    - '**/*'
+    # - $CODEBUILD_SRC_DIR/codepipeline/multi-tier-app/**/*  
   name: devops-df-build-artifact
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
