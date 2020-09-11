@@ -16,13 +16,8 @@ version: 0.2
   #git-credential-helper: yes
 phases:
   install:
-    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
-    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
     runtime-versions:
-      nodejs: 8
-    #commands:
-      # - command
-      # - command
+      nodejs: 10
   pre_build:
     commands:
       - echo "list the directory"
