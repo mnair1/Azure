@@ -1,0 +1,47 @@
+version: 0.2
+
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  #secrets-manager:
+     # key: secret-id:json-key:version-stage:version-id
+     # key: secret-id:json-key:version-stage:version-id
+  #exported-variables:
+     # - variable
+     # - variable
+  #git-credential-helper: yes
+phases:
+  install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    runtime-versions:
+      nodejs: 8
+    #commands:
+      # - command
+      # - command
+  pre_build:
+    commands:
+      - echo "list the directory"
+      - npm --version
+      - cd codepipeline
+  build:
+    commands:
+      - cd multi-tier-app
+      - ls
+      - echo "build started at `date`"
+      - npm install
+  post_build:
+    commands:
+      - zip -rf code_artifact.zip .
+      - cp code_artifact.zip $CODEBUILD_SRC_DIR/
+      - ls $CODEBUILD_SRC_DIR
+artifacts:
+  files:
+    - code_artifact.zip
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
