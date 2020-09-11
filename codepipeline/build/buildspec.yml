@@ -24,6 +24,15 @@ phases:
       - echo "list multi tier app directory"
       - ls
 
+      - echo "Existing Python code"
+      - cat mongo.py
+      - echo "Updating Python Code with Specs"
+      - sed -i "s/<MONGO_DB>/$MONGO_DB/g" mongo.py
+      - sed -i "s/<MONGO_HOST>/$MONGO_HOST/g" mongo.py
+      - sed -i "s/<MONGO_PORT>/$MONGO_PORT/g" mongo.py
+      - cat mongo.py
+
+      - echo "Existing Package.json"
       - cat package.json
       - echo "Updating NodeJs config with Specs"
       - sed -i "s/<VERSION_AXIOS>/$VERSION_AXIOS/g" package.json
@@ -41,18 +50,16 @@ phases:
       - echo "Build Completed at `date`"
   post_build:
     commands:
-      - echo "Existing Python code"
-      - cat mongo.py
-      - echo "Updating Python Code with Specs"
-      - sed -i "s/<MONGO_DB>/$MONGO_DB/g" mongo.py
-      - sed -i "s/<MONGO_HOST>/$MONGO_HOST/g" mongo.py
-      - sed -i "s/<MONGO_PORT>/$MONGO_PORT/g" mongo.py
-      - cat mongo.py
+      
+      - echo "Compressing the artifacts"
+      - zip -r devops-df-build-artifact.zip .
+      - ls
+
 artifacts:
   files:
-    - '**/*'
-    # - $CODEBUILD_SRC_DIR/codepipeline/multi-tier-app/**/*  
-  name: devops-df-build-artifact
+    # - '**/*'
+    - $CODEBUILD_SRC_DIR/codepipeline/multi-tier-app/devops-df-build-artifact.zip
+  name: build-artifact
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
   #base-directory: location
