@@ -30,8 +30,8 @@ phases:
       - sed -i "s/<VERSION_REACT>/$VERSION_REACT/g" package.json
       - sed -i "s/<VERSION_REACT_DOM>/$VERSION_REACT_DOM/g" package.json
       - sed -i "s/<VERSION_REACT_SCRIPTS>/$VERSION_REACT_SCRIPTS/g" package.json
-      - sed -i "s/<NODEJS_HOST>/$NODEJS_HOST/g" package.json
-      - sed -i "s/<NODEJS_PORT>/$NODEJS_PORT/g" package.json
+      - sed -i "s/<FLASK_HOST>/$FLASK_HOST/g" package.json
+      - sed -i "s/<FLASK_PORT>/$FLASK_PORT/g" package.json
       - cat package.json
 
   build:
