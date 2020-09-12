@@ -52,7 +52,7 @@ phases:
     commands:
       
       - echo "Compressing the artifacts"
-      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec .
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec.yml .
       - zip -r devops-df-build-artifact.zip .
       - ls
       - cat mongo.py
