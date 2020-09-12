@@ -3,15 +3,16 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/datafence_app/
-# hooks:
-#   BeforeInstall:
-#     - location: scripts/install_dependencies
-#       timeout: 300
-#       runas: root
-#     - location: scripts/start_server
-#       timeout: 300
-#       runas: root
-#   ApplicationStop:
-#     - location: scripts/stop_server
-#       timeout: 300
-#       runas: root
+hooks:
+  AfterInstall:
+    - location: scripts/start_flask
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: scripts/start_server
+      timeout: 300
+      runas: root
+  # ApplicationStop:
+  #   - location: scripts/stop_server
+  #     timeout: 300
+  #     runas: root

@@ -53,6 +53,9 @@ phases:
       
       - echo "Compressing the artifacts"
       - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec.yml .
+      - mkdir scripts
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_flask scripts/
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_node scripts/
       - zip -r devops-df-build-artifact.zip .
       - ls
       - cat mongo.py
