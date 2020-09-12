@@ -58,6 +58,7 @@ phases:
       - cat package.json
       - cd ../../
       - cp codepipeline/multi-tier-app/devops-df-build-artifact.zip .
+      - cp codepipeline/deploy/appspec.yml .
 
 artifacts:
   files:
