@@ -65,6 +65,7 @@ artifacts:
     # - '**/*'
     - devops-df-build-artifact.zip
     - appspec.yml
+    - codepipeline/multi-tier-app/**/*
   name: build-artifact
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
