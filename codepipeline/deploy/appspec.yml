@@ -1,7 +1,7 @@
 version: 0.0
 os: linux
 files:
-  - source: devops-df-build-artifact.zip
+  - source: /
     destination: /home/ubuntu/
 # hooks:
 #   BeforeInstall:
