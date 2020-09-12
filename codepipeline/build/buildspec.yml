@@ -52,20 +52,18 @@ phases:
     commands:
       
       - echo "Compressing the artifacts"
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec .
       - zip -r devops-df-build-artifact.zip .
       - ls
       - cat mongo.py
       - cat package.json
       - cd ../../
       - cp codepipeline/multi-tier-app/devops-df-build-artifact.zip .
-      - cp codepipeline/deploy/appspec.yml .
 
 artifacts:
   files:
     # - '**/*'
     - devops-df-build-artifact.zip
-    - appspec.yml
-    - codepipeline/multi-tier-app/**/*
   name: build-artifact
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
