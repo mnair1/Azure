@@ -63,6 +63,7 @@ artifacts:
   files:
     # - '**/*'
     - devops-df-build-artifact.zip
+    - appspec.yml
   name: build-artifact
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
