@@ -1,4 +1,4 @@
 #!/bin/bash
 cd /home/ubuntu/datafence_app/
-npm install
+# npm install
 nohup npm start > /dev/null 2> /dev/null < /dev/null &

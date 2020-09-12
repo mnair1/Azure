@@ -46,7 +46,7 @@ phases:
   build:
     commands:
       - echo "Build Started at `date`"
-      # - npm install
+      - npm install
       - echo "Build Completed at `date`"
   post_build:
     commands:
@@ -56,7 +56,7 @@ phases:
       - mkdir scripts
       - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_flask scripts/
       - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_node scripts/
-      - zip -r devops-df-build-artifact.zip .
+      - zip --symlinks -r devops-df-build-artifact.zip .
       - ls
       - cat mongo.py
       - cat package.json
