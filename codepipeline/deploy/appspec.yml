@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/datafence_app/
+hooks:
+  AfterInstall:
+    - location: scripts/start_flask
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: scripts/start_node
+      timeout: 300
+      runas: root
