@@ -62,11 +62,13 @@ phases:
       - cat package.json
       - cd ../../
       - cp codepipeline/multi-tier-app/devops-df-build-artifact.zip .
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec.yml .
 
 artifacts:
   files:
     # - '**/*'
     - devops-df-build-artifact.zip
+    - appspec.yml
   name: build-artifact
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
