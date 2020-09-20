@@ -52,16 +52,18 @@ phases:
     commands:
       
       - echo "Compressing the artifacts"
-      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec.yml .
-      - mkdir scripts
-      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_flask scripts/
-      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_node scripts/
-      - zip --symlinks -r devops-df-build-artifact.zip .
+      # - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec.yml .
+      # - mkdir scripts
+      # - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_flask scripts/
+      # - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_node scripts/
+      # - zip --symlinks -r devops-df-build-artifact.zip .
+      - zip --symlinks -r app-artifact.zip .
       - ls
       - cat mongo.py
       - cat package.json
       - cd ../../
-      - cp codepipeline/multi-tier-app/devops-df-build-artifact.zip .
+      # - cp codepipeline/multi-tier-app/devops-df-build-artifact.zip .
+      - cp codepipeline/multi-tier-app/app-artifact.zip .
       - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec.yml .
       - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/uncompress .
       - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_flask .
@@ -70,7 +72,8 @@ phases:
 artifacts:
   files:
     # - '**/*'
-    - devops-df-build-artifact.zip
+    # - devops-df-build-artifact.zip
+    - app-artifact.zip
     - appspec.yml
     - uncompress
     - start_node
