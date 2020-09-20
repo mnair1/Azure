@@ -63,12 +63,18 @@ phases:
       - cd ../../
       - cp codepipeline/multi-tier-app/devops-df-build-artifact.zip .
       - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec.yml .
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/uncompress .
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_flask .
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_node .
 
 artifacts:
   files:
     # - '**/*'
     - devops-df-build-artifact.zip
     - appspec.yml
+    - uncompress
+    - start_node
+    - start_flask
   name: build-artifact
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
