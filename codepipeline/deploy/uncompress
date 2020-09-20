@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /home/ubuntu/datafence_app/
+unzip app-artifact.zip

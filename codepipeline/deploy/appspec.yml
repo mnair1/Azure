@@ -1,14 +1,17 @@
 version: 0.0
 os: linux
 files:
-  - source: /
+  - source: app-artifact.zip
     destination: /home/ubuntu/datafence_app/
 hooks:
   AfterInstall:
-    - location: scripts/start_flask
+    - location: uncompress
       timeout: 300
       runas: root
   ApplicationStart:
-    - location: scripts/start_node
+    - location: start_flask
+      timeout: 300
+      runas: root
+    - location: start_node
       timeout: 300
       runas: root
