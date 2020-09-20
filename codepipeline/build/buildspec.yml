@@ -78,7 +78,7 @@ artifacts:
     - uncompress
     - start_node
     - start_flask
-  name: build-artifact
+  name: devops-df-build-artifact.zip
   # name: $(date +%Y-%m-%d)
   #discard-paths: yes
   #base-directory: location
