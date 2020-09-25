@@ -10,8 +10,8 @@ pipeline {
         SOURCE_ARTIFACTS_PATH = "source_artifacts"
         BUILD_ARTIFACTS_PATH = "build_artifacts"
         BUILDSPEC_PATH = "codepipeline/build/buildspec.yml"
-        CODEBUILD_CREDENTIALS = env.CODEBUILD_CREDENTIALS_ID
-        REGION = env.AWS_REGION
+        CODEBUILD_CREDENTIALS = "${env.CODEBUILD_CREDENTIALS_ID}"
+        REGION = "${env.AWS_REGION}"
     }
     stages { 
         
