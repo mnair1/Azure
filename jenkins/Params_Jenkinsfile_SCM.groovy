@@ -31,7 +31,7 @@ pipeline {
         
         stage('Front-end-Build') {
             agent {
-                docker { image 'node:14-alpine' }
+                docker { image 'node:12' }
             }
             steps {
                 echo "Node Version"
