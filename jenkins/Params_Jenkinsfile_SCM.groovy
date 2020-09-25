@@ -2,16 +2,22 @@ pipeline {
     agent any
     parameters {
         string(name: 'CODEBUILD_PROJ_NAME', defaultValue: '', description: 'CodeBuild Project Name')
-        string(name: 'CODEBUILD_CREDENTIALS_ID', defaultValue: "${env.CODEBUILD_CREDENTIALS_ID}", description: 'Jenkins Credentials ID for CodeBuild')
+        string(name: 'ARTIFACTS_BUCKET_NAME', defaultValue: '', description: 'Name of S3 Artifacts Bucket')
     }
-    // environment { 
-        
-    // }
+    environment { 
+        ARTIFACT_NAME = "artifact.zip"
+        ARTIFACTS_FOLDER = "jenkins_artifacts"
+        SOURCE_ARTIFACTS_PATH = "source_artifacts"
+        BUILD_ARTIFACTS_PATH = "build_artifacts"
+        BUILDSPEC_PATH = "codepipeline/build/buildspec.yml"
+        CODEBUILD_CREDENTIALS = "${env.CODEBUILD_CREDENTIALS_ID}"
+        REGION = "${env.AWS_REGION}"
+    }
     stages { 
         
         stage('Build') {
             steps {
-            awsCodeBuild artifactEncryptionDisabledOverride: '', artifactLocationOverride: 'devops-df-cicd-artifact-bucket-jenkins-syed', artifactNameOverride: 'artifact.zip', artifactNamespaceOverride: '', artifactPackagingOverride: 'ZIP', artifactPathOverride: 'jenkins_artifacts/build_artifacts/', artifactTypeOverride: 'S3', awsAccessKey: env.AWS_ACCESS_KEY_ID, awsSecretKey: env.AWS_SECRET_ACCESS_KEY, buildSpecFile: '', buildTimeoutOverride: '', cacheLocationOverride: '', cacheModesOverride: '', cacheTypeOverride: '', certificateOverride: '', cloudWatchLogsGroupNameOverride: '', cloudWatchLogsStatusOverride: 'ENABLED', cloudWatchLogsStreamNameOverride: '', computeTypeOverride: '', credentialsId: "${params.CODEBUILD_CREDENTIALS_ID}", credentialsType: 'jenkins', cwlStreamingDisabled: '', downloadArtifacts: 'false', downloadArtifactsRelativePath: '', envParameters: '', envVariables: '', environmentTypeOverride: '', exceptionFailureMode: '', gitCloneDepthOverride: '', imageOverride: '', insecureSslOverride: '', localSourcePath: '', overrideArtifactName: '', privilegedModeOverride: '', projectName: "${params.CODEBUILD_PROJ_NAME}", proxyHost: '', proxyPort: '', region: 'us-east-1', reportBuildStatusOverride: '', s3LogsEncryptionDisabledOverride: '', s3LogsLocationOverride: '', s3LogsStatusOverride: '', secondaryArtifactsOverride: '', secondarySourcesOverride: '', secondarySourcesVersionOverride: '', serviceRoleOverride: '', sourceControlType: 'jenkins', sourceLocationOverride: 'devops-df-cicd-artifact-bucket-jenkins-syed/jenkins_artifacts/source_artifacts/artifact.zip', sourceTypeOverride: 'S3', sourceVersion: '', sseAlgorithm: '', workspaceSubdir: ''
+            awsCodeBuild  artifactLocationOverride: ${params.ARTIFACTS_BUCKET_NAME}, artifactNameOverride: "${env.ARTIFACT_NAME}", artifactPackagingOverride: 'ZIP', artifactPathOverride: "${env.ARTIFACTS_FOLDER}/${env.BUILD_ARTIFACTS_PATH}/", artifactTypeOverride: 'S3', awsAccessKey: env.AWS_ACCESS_KEY_ID, awsSecretKey: env.AWS_SECRET_ACCESS_KEY, buildSpecFile: ${env.BUILDSPEC_PATH}, cloudWatchLogsGroupNameOverride: '', cloudWatchLogsStatusOverride: 'ENABLED', cloudWatchLogsStreamNameOverride: '', computeTypeOverride: '', credentialsId: "${env.CODEBUILD_CREDENTIALS}", credentialsType: 'jenkins', cwlStreamingDisabled: '', downloadArtifacts: 'false', downloadArtifactsRelativePath: '', envParameters: '', envVariables: '', environmentTypeOverride: '', localSourcePath: '', overrideArtifactName: '', privilegedModeOverride: '', projectName: "${params.CODEBUILD_PROJ_NAME}", proxyHost: '', region: "${env.REGION}", serviceRoleOverride: '', sourceControlType: 'jenkins', sourceLocationOverride: "${params.ARTIFACTS_BUCKET_NAME}/${env.ARTIFACTS_FOLDER}/${env.SOURCE_ARTIFACTS_PATH}/${env.ARTIFACT_NAME}", sourceTypeOverride: 'S3', sourceVersion: '', workspaceSubdir: ''
         }
         }
         

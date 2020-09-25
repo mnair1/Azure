@@ -1,8 +1,0 @@
-GITHUB_REPO_BRANCH=*/master
-GITHUB_REPO_URL=https://github.com/mkukreja1/dfcloudacademy.git
-CODEBUILD_PROJ_NAME=devops-df-cicd-build-project
-
-
-Global
-CODEBUILD_CREDENTIALS_ID=c9e5bdf8-b9ae-4ab0-9b44-7dda99c9c200
-GITHUB_CREDENTIALS_ID=3ab24faf-8925-4f87-a3f0-4408584b3e85
