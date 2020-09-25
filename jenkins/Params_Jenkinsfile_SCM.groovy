@@ -23,6 +23,9 @@ pipeline {
         VERSION_REACT_DOM = "^16.5.1"
         VERSION_REACT_SCRIPTS = "1.1.5"
 
+        JENKINS_DIRECTORY = "${WORKSPACE}/codepipeline"
+        MULTI_TIER_APP_DIRECTORY = "${JENKINS_DIRECTORY}/multi-tier-app"
+
     }
     stages { 
         
@@ -37,45 +40,46 @@ pipeline {
                 
                 echo "list the directory"
                 sh 'ls'
-                sh 'cd codepipeline/multi-tier-app'
+                // sh 'cd codepipeline/multi-tier-app'
                 echo "list multi tier app directory"
-                sh 'ls'
+                sh 'ls $MULTI_TIER_APP_DIRECTORY'
 
                 echo "Existing Python code"
-                sh 'cat mongo.py'
+                sh 'cat $MULTI_TIER_APP_DIRECTORY/mongo.py'
                 echo "Updating Python Code with Specs"
-                sh "sed -i 's/<MONGO_DB>/$MONGO_DB/g' mongo.py"
-                sh "sed -i 's/<MONGO_HOST>/$MONGO_HOST/g' mongo.py"
-                sh "sed -i 's/<MONGO_PORT>/$MONGO_PORT/g' mongo.py"
+                sh "sed -i 's/<MONGO_DB>/$MONGO_DB/g' $MULTI_TIER_APP_DIRECTORY/mongo.py"
+                sh "sed -i 's/<MONGO_HOST>/$MONGO_HOST/g' $MULTI_TIER_APP_DIRECTORY/mongo.py"
+                sh "sed -i 's/<MONGO_PORT>/$MONGO_PORT/g' $MULTI_TIER_APP_DIRECTORY/mongo.py"
                 //sh "cat mongo.py"
 
                 echo "Existing Package.json"
-                sh "cat package.json"
+                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
                 echo "Updating NodeJs config with Specs"
-                sh "sed -i 's/<VERSION_AXIOS>/$VERSION_AXIOS/g' package.json"
-                sh "sed -i 's/<VERSION_REACT>/$VERSION_REACT/g' package.json"
-                sh "sed -i 's/<VERSION_REACT_DOM>/$VERSION_REACT_DOM/g' package.json"
-                sh "sed -i 's/<VERSION_REACT_SCRIPTS>/$VERSION_REACT_SCRIPTS/g' package.json"
-                sh "sed -i 's/<FLASK_HOST>/$FLASK_HOST/g' package.json"
-                sh "sed -i 's/<FLASK_PORT>/$FLASK_PORT/g' package.json"
-                sh "cat package.json"
+                sh "sed -i 's/<VERSION_AXIOS>/$VERSION_AXIOS/g' $MULTI_TIER_APP_DIRECTORY/package.json"
+                sh "sed -i 's/<VERSION_REACT>/$VERSION_REACT/g' $MULTI_TIER_APP_DIRECTORY/package.json"
+                sh "sed -i 's/<VERSION_REACT_DOM>/$VERSION_REACT_DOM/g' $MULTI_TIER_APP_DIRECTORY/package.json"
+                sh "sed -i 's/<VERSION_REACT_SCRIPTS>/$VERSION_REACT_SCRIPTS/g' $MULTI_TIER_APP_DIRECTORY/package.json"
+                sh "sed -i 's/<FLASK_HOST>/$FLASK_HOST/g' $MULTI_TIER_APP_DIRECTORY/package.json"
+                sh "sed -i 's/<FLASK_PORT>/$FLASK_PORT/g' $MULTI_TIER_APP_DIRECTORY/package.json"
+                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
                 echo "Build Started at `date`"
-                sh 'npm install'
+                sh 'cd $MULTI_TIER_APP_DIRECTORY && npm install'
                 echo "Build Completed at `date`"
 
                 echo "Compressing the artifacts"
-                sh 'zip --symlinks -r app-artifact.zip .'
-                sh 'ls'
-                sh 'cat mongo.py'
-                sh 'cat package.json'
-                sh 'cd ../../'
+                sh 'cd $MULTI_TIER_APP_DIRECTORY/ && zip --symlinks -r app-artifact.zip .'
+                sh 'ls $MULTI_TIER_APP_DIRECTORY/'
+                sh 'cat $MULTI_TIER_APP_DIRECTORY/mongo.py'
+                sh 'cat $MULTI_TIER_APP_DIRECTORY/package.json'
                 
-                sh 'cp codepipeline/multi-tier-app/app-artifact.zip .'
-                sh 'cp $WORKSPACE/codepipeline/deploy/appspec.yml .'
-                sh 'cp $WORKSPACE/codepipeline/deploy/uncompress .'
-                sh 'cp $WORKSPACE/codepipeline/deploy/start_flask .'
-                sh 'cp $WORKSPACE/codepipeline/deploy/start_node .'
+                
+                sh 'cp $MULTI_TIER_APP_DIRECTORY/app-artifact.zip .'
+                sh 'cp $JENKINS_DIRECTORY/deploy/appspec.yml .'
+                sh 'cp $JENKINS_DIRECTORY/deploy/uncompress .'
+                sh 'cp $JENKINS_DIRECTORY/deploy/start_flask .'
+                sh 'cp $JENKINS_DIRECTORY/deploy/start_node .'
 
+                sh 'ls'
                 sh 'mkdir build_artifacts'
                 sh 'cp app-artifact.zip build_artifacts/'
                 sh 'cp appspec.yml build_artifacts/'
