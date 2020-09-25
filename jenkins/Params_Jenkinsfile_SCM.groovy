@@ -66,6 +66,7 @@ pipeline {
                 sh 'cd $MULTI_TIER_APP_DIRECTORY && npm install'
                 echo "Build Completed at `date`"
 
+                sh "apt-get update && apt-get install zip"
                 echo "Compressing the artifacts"
                 sh 'cd $MULTI_TIER_APP_DIRECTORY/ && zip --symlinks -r app-artifact.zip .'
                 sh 'ls $MULTI_TIER_APP_DIRECTORY/'
