@@ -23,7 +23,7 @@ pipeline {
         VERSION_REACT_DOM = "^16.5.1"
         VERSION_REACT_SCRIPTS = "1.1.5"
 
-        JENKINS_DIRECTORY = "${WORKSPACE}/codepipeline"
+        JENKINS_DIRECTORY = "codepipeline"
         MULTI_TIER_APP_DIRECTORY = "${JENKINS_DIRECTORY}/multi-tier-app"
 
     }
