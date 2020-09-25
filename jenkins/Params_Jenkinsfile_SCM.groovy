@@ -66,31 +66,38 @@ pipeline {
                 sh 'cd $MULTI_TIER_APP_DIRECTORY && npm install'
                 echo "Build Completed at `date`"
 
-                sh "apt-get update && apt-get install zip"
-                echo "Compressing the artifacts"
-                sh 'cd $MULTI_TIER_APP_DIRECTORY/ && zip --symlinks -r app-artifact.zip .'
-                sh 'ls $MULTI_TIER_APP_DIRECTORY/'
-                sh 'cat $MULTI_TIER_APP_DIRECTORY/mongo.py'
-                sh 'cat $MULTI_TIER_APP_DIRECTORY/package.json'
                 
-                
-                sh 'cp $MULTI_TIER_APP_DIRECTORY/app-artifact.zip .'
-                sh 'cp $JENKINS_DIRECTORY/deploy/appspec.yml .'
-                sh 'cp $JENKINS_DIRECTORY/deploy/uncompress .'
-                sh 'cp $JENKINS_DIRECTORY/deploy/start_flask .'
-                sh 'cp $JENKINS_DIRECTORY/deploy/start_node .'
-
-                sh 'ls'
-                sh 'mkdir build_artifacts'
-                sh 'cp app-artifact.zip build_artifacts/'
-                sh 'cp appspec.yml build_artifacts/'
-                sh 'cp uncompress build_artifacts/'
-                sh 'cp start_flask build_artifacts/'
-                sh 'cp start_node build_artifacts/'
-                sh 'ls build_artifacts'
             }
              }
+        stage('Post-Build') {
+            agent any 
+            steps {
+                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
+                sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
+                // sh "sudo apt-get update && sudo apt-get install zip"
+                // echo "Compressing the artifacts"
+                // sh 'cd $MULTI_TIER_APP_DIRECTORY/ && zip --symlinks -r app-artifact.zip .'
+                // sh 'ls $MULTI_TIER_APP_DIRECTORY/'
+                // sh 'cat $MULTI_TIER_APP_DIRECTORY/mongo.py'
+                // sh 'cat $MULTI_TIER_APP_DIRECTORY/package.json'
+                
+                
+                // sh 'cp $MULTI_TIER_APP_DIRECTORY/app-artifact.zip .'
+                // sh 'cp $JENKINS_DIRECTORY/deploy/appspec.yml .'
+                // sh 'cp $JENKINS_DIRECTORY/deploy/uncompress .'
+                // sh 'cp $JENKINS_DIRECTORY/deploy/start_flask .'
+                // sh 'cp $JENKINS_DIRECTORY/deploy/start_node .'
 
+                // sh 'ls'
+                // sh 'mkdir build_artifacts'
+                // sh 'cp app-artifact.zip build_artifacts/'
+                // sh 'cp appspec.yml build_artifacts/'
+                // sh 'cp uncompress build_artifacts/'
+                // sh 'cp start_flask build_artifacts/'
+                // sh 'cp start_node build_artifacts/'
+                // sh 'ls build_artifacts'
+            }
+        }
         // stage('Build') {
         //     agent any
         //     steps {
