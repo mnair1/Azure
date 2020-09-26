@@ -84,7 +84,7 @@ pipeline {
                     sh "ls"
                 }
                 
-                sh "mkdir build_artifact"
+                sh "mkdir -p build_artifact"
                 
                 sh 'cp $JENKINS_DIRECTORY/deploy/appspec.yml build_artifact/'
                 sh 'cp $JENKINS_DIRECTORY/deploy/uncompress build_artifact/'
