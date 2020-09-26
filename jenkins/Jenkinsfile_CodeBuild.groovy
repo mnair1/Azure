@@ -80,7 +80,7 @@ pipeline {
                     sh "cat package.json"
                     sh "cat mongo.py"
                     echo "Compressing the artifacts"
-                    sh 'tar -czvf app-artifact.zip .'
+                    sh 'tar -czvf app-artifact.tar.gz .'
                     sh "ls"
                 }
                 
@@ -90,7 +90,7 @@ pipeline {
                 sh 'cp $JENKINS_DIRECTORY/deploy/uncompress build_artifact/'
                 sh 'cp $JENKINS_DIRECTORY/deploy/start_flask build_artifact/'
                 sh 'cp $JENKINS_DIRECTORY/deploy/start_node build_artifact/'
-                sh 'cp $MULTI_TIER_APP_DIRECTORY/app-artifact.zip build_artifact/'
+                sh 'cp $MULTI_TIER_APP_DIRECTORY/app-artifact.tar.gz build_artifact/'
                 
                 sh 'ls build_artifact'
                 
