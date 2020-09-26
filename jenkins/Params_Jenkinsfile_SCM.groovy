@@ -9,7 +9,7 @@ pipeline {
         ARTIFACTS_FOLDER = "jenkins_artifacts"
         SOURCE_ARTIFACTS_PATH = "source_artifacts"
         BUILD_ARTIFACTS_PATH = "build_artifacts"
-        BUILDSPEC_PATH = "codepipeline/build/buildspec.yml"
+        BUILDSPEC_PATH = "jenkins/build/buildspec.yml"
         CODEBUILD_CREDENTIALS = "${env.CODEBUILD_CREDENTIALS_ID}"
         REGION = "${env.AWS_REGION}"
 
@@ -23,7 +23,7 @@ pipeline {
         VERSION_REACT_DOM = "^16.5.1"
         VERSION_REACT_SCRIPTS = "1.1.5"
 
-        JENKINS_DIRECTORY = "codepipeline"
+        JENKINS_DIRECTORY = "jenkins"
         MULTI_TIER_APP_DIRECTORY = "${JENKINS_DIRECTORY}/multi-tier-app"
 
     }
@@ -71,14 +71,14 @@ pipeline {
                 sh "pwd"
                 sh "ls"
                 sh "ls /datafence"
-                sh "cat /datafence/codepipeline/multi-tier-app/package.json"
+                sh "cat /datafence/jenkins/multi-tier-app/package.json"
                 echo "Node Version"
                 sh 'node --version'
                 sh 'npm --version'
                 
                 
                 echo "Build Started at `date`"
-                sh 'cd /datafence/codepipeline/multi-tier-app/ && npm install'
+                sh 'cd /datafence/jenkins/multi-tier-app/ && npm install'
                 echo "Build Completed at `date`"
 
                 
@@ -91,7 +91,7 @@ pipeline {
                 sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
                 sh "ls $MULTI_TIER_APP_DIRECTORY/"
                 echo "Compressing the artifacts"
-                sh 'cd $MULTI_TIER_APP_DIRECTORY/ && zip --symlinks -r app-artifact.zip .'
+                sh 'cd $MULTI_TIER_APP_DIRECTORY/ && tar -czvf app-artifact.zip .'
                 // sh 'ls $MULTI_TIER_APP_DIRECTORY/'
                 // sh 'cat $MULTI_TIER_APP_DIRECTORY/mongo.py'
                 // sh 'cat $MULTI_TIER_APP_DIRECTORY/package.json'
