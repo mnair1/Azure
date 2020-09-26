@@ -73,15 +73,14 @@ pipeline {
             }
             steps {
                 sh "ls"
-                // sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
-                sh "cat package.json"
+                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
                 echo "Node Version"
                 sh 'node --version'
                 sh 'npm --version'
                 
                 
                 echo "Build Started at `date`"
-                sh 'npm install'
+                sh 'cd $MULTI_TIER_APP_DIRECTORY && npm install'
                 echo "Build Completed at `date`"
 
                 
