@@ -29,15 +29,9 @@ pipeline {
     }
     stages { 
         
-        stage('Front-end-Build') {
-            agent {
-                docker { image 'node:12' }
-            }
+        stage('Pre-Build') {
+            agent any
             steps {
-                echo "Node Version"
-                sh 'node --version'
-                sh 'npm --version'
-                
                 echo "list the directory"
                 sh 'ls'
                 // sh 'cd codepipeline/multi-tier-app'
@@ -62,6 +56,25 @@ pipeline {
                 sh "sed -i 's/<FLASK_HOST>/$FLASK_HOST/g' $MULTI_TIER_APP_DIRECTORY/package.json"
                 sh "sed -i 's/<FLASK_PORT>/$FLASK_PORT/g' $MULTI_TIER_APP_DIRECTORY/package.json"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
+            }
+        }
+        stage('After-Pre-Build') {
+            agent any
+            steps {
+                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
+               }
+           }
+        stage('Build') {
+            agent {
+                docker { image 'node:12' }
+            }
+            steps {
+                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
+                echo "Node Version"
+                sh 'node --version'
+                sh 'npm --version'
+                
+                
                 echo "Build Started at `date`"
                 sh 'cd $MULTI_TIER_APP_DIRECTORY && npm install'
                 echo "Build Completed at `date`"
