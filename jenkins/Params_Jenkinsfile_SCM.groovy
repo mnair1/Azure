@@ -72,6 +72,7 @@ pipeline {
                 }
             }
             steps {
+                sh "pwd"
                 sh "ls"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
                 echo "Node Version"
