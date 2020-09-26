@@ -87,11 +87,19 @@ pipeline {
         stage('Post-Build') {
             
             steps {
-                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
-                sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
-                sh "ls $MULTI_TIER_APP_DIRECTORY/"
-                echo "Compressing the artifacts"
-                sh 'cd $MULTI_TIER_APP_DIRECTORY/ && tar -czvf app-artifact.zip .'
+                dir("$MULTI_TIER_APP_DIRECTORY") {
+                    sh "ls"
+                    sh "cat package.json"
+                    sh "cat mongo.py"
+                    echo "Compressing the artifacts"
+                    sh 'cd $MULTI_TIER_APP_DIRECTORY/ && tar -czvf app-artifact.zip .'
+                    sh "ls"
+                }
+                // sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
+                // sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
+                // sh "ls $MULTI_TIER_APP_DIRECTORY/"
+                // echo "Compressing the artifacts"
+                // sh 'cd $MULTI_TIER_APP_DIRECTORY/ && tar -czvf app-artifact.zip .'
                 // sh 'ls $MULTI_TIER_APP_DIRECTORY/'
                 // sh 'cat $MULTI_TIER_APP_DIRECTORY/mongo.py'
                 // sh 'cat $MULTI_TIER_APP_DIRECTORY/package.json'
