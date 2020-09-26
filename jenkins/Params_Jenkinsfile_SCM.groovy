@@ -92,7 +92,7 @@ pipeline {
                     sh "cat package.json"
                     sh "cat mongo.py"
                     echo "Compressing the artifacts"
-                    sh 'cd $MULTI_TIER_APP_DIRECTORY/ && tar -czvf app-artifact.zip .'
+                    sh 'tar -czvf app-artifact.zip .'
                     sh "ls"
                 }
                 // sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
