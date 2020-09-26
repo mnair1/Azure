@@ -82,7 +82,7 @@ pipeline {
                 
                 
                 echo "Build Started at `date`"
-                sh 'cd /datafence && npm install'
+                sh 'cd /datafence/codepipeline/multi-tier-app/ && npm install'
                 echo "Build Completed at `date`"
 
                 
