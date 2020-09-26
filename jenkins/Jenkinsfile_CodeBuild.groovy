@@ -1,8 +1,8 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'CODEBUILD_PROJ_NAME', defaultValue: '', description: 'CodeBuild Project Name')
-        string(name: 'ARTIFACTS_BUCKET_NAME', defaultValue: '', description: 'Name of S3 Artifacts Bucket')
+        string(name: 'CODEBUILD_PROJ_NAME', defaultValue: 'devops-df-cicd-build-project', description: 'CodeBuild Project Name')
+        string(name: 'ARTIFACTS_BUCKET_NAME', defaultValue: 'devops-df-cicd-artifact-bucket-jenkins-syed', description: 'Name of S3 Artifacts Bucket')
     }
     environment { 
         ARTIFACT_NAME = "artifact.zip"
