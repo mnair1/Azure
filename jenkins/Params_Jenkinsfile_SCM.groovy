@@ -84,7 +84,7 @@ pipeline {
             agent {
                 docker { 
                     image 'node:12' 
-                    args '-v /var/jenkins_home/workspace/${JOB_NAME}:/datafence'
+                    args "-v /var/jenkins_home/workspace/${JOB_NAME}:/datafence"
 
                 }
             }
@@ -92,20 +92,9 @@ pipeline {
                 echo "Node Version"
                 sh 'npm --version'
                 
-                // echo "${JOB_NAME}"
-                // sh "pwd"
-                // sh "ls"
                 sh "ls /datafence"
-                // dir("/datafence/$MULTI_TIER_APP_DIRECTORY") {
-                    
-                //     sh "cat package.json"
-                //     echo "Node Version"
-                //     sh 'npm --version'
-                //     sh 'npm install'
-                    
-                // }
-                sh "cat /datafence/jenkins/multi-tier-app/package.json"
-                sh 'cd /datafence/jenkins/multi-tier-app/ && npm install'
+                sh "cat /datafence/${MULTI_TIER_APP_DIRECTORY}/package.json"
+                sh "cd /datafence/${MULTI_TIER_APP_DIRECTORY} && npm install"
                 
                 
             }
@@ -121,16 +110,8 @@ pipeline {
                     sh 'tar -czvf app-artifact.zip .'
                     sh "ls"
                 }
-                // sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
-                // sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
-                // sh "ls $MULTI_TIER_APP_DIRECTORY/"
-                // echo "Compressing the artifacts"
-                // sh 'cd $MULTI_TIER_APP_DIRECTORY/ && tar -czvf app-artifact.zip .'
-                // sh 'ls $MULTI_TIER_APP_DIRECTORY/'
-                // sh 'cat $MULTI_TIER_APP_DIRECTORY/mongo.py'
-                // sh 'cat $MULTI_TIER_APP_DIRECTORY/package.json'
                 
-                sh "mkdir artifacts_folder"
+                sh "mkdir build_artifact"
                 
                 sh 'cp $JENKINS_DIRECTORY/deploy/appspec.yml artifacts_folder/'
                 sh 'cp $JENKINS_DIRECTORY/deploy/uncompress artifacts_folder/'
@@ -138,20 +119,7 @@ pipeline {
                 sh 'cp $JENKINS_DIRECTORY/deploy/start_node artifacts_folder/'
                 sh 'cp $MULTI_TIER_APP_DIRECTORY/app-artifact.zip artifacts_folder/'
                 
-                sh 'ls build_artifacts'
-                
-                // sh 'cp $JENKINS_DIRECTORY/deploy/appspec.yml .'
-                // sh 'cp $JENKINS_DIRECTORY/deploy/uncompress .'
-                // sh 'cp $JENKINS_DIRECTORY/deploy/start_flask .'
-                // sh 'cp $JENKINS_DIRECTORY/deploy/start_node .'
-
-                // sh 'ls'
-                // sh 'mkdir build_artifacts'
-                // sh 'cp app-artifact.zip build_artifacts/'
-                // sh 'cp appspec.yml build_artifacts/'
-                // sh 'cp uncompress build_artifacts/'
-                // sh 'cp start_flask build_artifacts/'
-                // sh 'cp start_node build_artifacts/'
+                sh 'ls build_artifact'
                 
             }
         }
