@@ -92,6 +92,8 @@ pipeline {
         stage('Post-Build') {
             
             steps {
+                sh "pwd"
+                echo "$WORKSPACE"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
                 sh "ls $MULTI_TIER_APP_DIRECTORY/"
