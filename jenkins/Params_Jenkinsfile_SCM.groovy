@@ -58,18 +58,12 @@ pipeline {
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
             }
         }
-        stage('After-Pre-Build') {
-           
-            steps {
-                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
-               }
-           }
         stage('Build') {
             agent {
                 docker { 
                     image 'node:12' 
                     args '-v /var/jenkins_home/workspace/${JOB_NAME}:/datafence'
-                    
+
                 }
             }
             steps {
@@ -96,9 +90,8 @@ pipeline {
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
                 sh "ls $MULTI_TIER_APP_DIRECTORY/"
-                // sh "sudo apt-get update && sudo apt-get install zip"
-                // echo "Compressing the artifacts"
-                // sh 'cd $MULTI_TIER_APP_DIRECTORY/ && zip --symlinks -r app-artifact.zip .'
+                echo "Compressing the artifacts"
+                sh 'cd $MULTI_TIER_APP_DIRECTORY/ && zip --symlinks -r app-artifact.zip .'
                 // sh 'ls $MULTI_TIER_APP_DIRECTORY/'
                 // sh 'cat $MULTI_TIER_APP_DIRECTORY/mongo.py'
                 // sh 'cat $MULTI_TIER_APP_DIRECTORY/package.json'
