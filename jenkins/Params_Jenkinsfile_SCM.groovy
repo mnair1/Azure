@@ -68,12 +68,14 @@ pipeline {
             agent {
                 docker { 
                     image 'node:12' 
-                    args '-v $WORKSPACE:/$MULTI_TIER_APP_DIRECTORY/'
+                    args '-v $WORKSPACE:/datafence'
                 }
             }
             steps {
                 sh "pwd"
                 sh "ls"
+                sh "ls /datafence"
+                sh "cat /datafence/codepipeline/multi-tier-app/package.json"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
                 echo "Node Version"
                 sh 'node --version'
