@@ -10,6 +10,10 @@ pipeline {
         string(name: 'VERSION_REACT', defaultValue: '^16.5.1', description: 'Version of React')
         string(name: 'VERSION_REACT_DOM', defaultValue: '^16.5.1', description: 'Version of React DOM')
         string(name: 'VERSION_REACT_SCRIPTS', defaultValue: '1.1.5', description: 'Version of React Scripts')
+        
+        string(name: 'ARTIFACTS_BUCKET_NAME', defaultValue: 'devops-df-cicd-artifact-bucket-jenkins-syed', description: 'Name of S3 Artifacts Bucket')
+        string(name: 'CODEDEPLOY_APP', defaultValue: 'devops-df-cicd-app', description: 'CodeDeploy Application Name')
+        string(name: 'CODEDEPLOY_DEP_GRP', defaultValue: 'multi-tier-app', description: 'CodeDeploy Deployment Group Name')
     }
     environment { 
 
@@ -18,7 +22,10 @@ pipeline {
 
         AWS_ACCESS_KEY_ID     = credentials('AWS_Access_Key')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_Secret_Key')
-
+        REGION = "${env.AWS_REGION}"
+        
+        ARTIFACTS_FOLDER = "jenkins_artifacts"
+        DEPLOY_ARTIFACTS_PATH = "deploy_artifacts"
     }
     stages { 
         
@@ -89,17 +96,9 @@ pipeline {
             }
         }
         stage('Deploy') {
-           
             steps {
-
-                sh 'ls'
-                sh 'ls build_artifact'
-
-                step([$class: 'AWSCodeDeployPublisher', applicationName: 'devops-df-cicd-app', awsAccessKey: "${AWS_ACCESS_KEY_ID}", awsSecretKey: "${AWS_SECRET_ACCESS_KEY}", credentials: '', deploymentGroupAppspec: false, deploymentGroupName: 'multi-tier-app', deploymentMethod: 'deploy', excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0, region: 'us-east-1', s3bucket: 'devops-df-cicd-artifact-bucket-jenkins-syed', s3prefix: 'jenkins_artifacts/deploy_artifacts', subdirectory: 'build_artifact', versionFileName: '', waitForCompletion: true])
+                step([$class: 'AWSCodeDeployPublisher', applicationName: "${params.CODEDEPLOY_APP}", awsAccessKey: "${AWS_ACCESS_KEY_ID}", awsSecretKey: "${AWS_SECRET_ACCESS_KEY}", credentials: '', deploymentGroupAppspec: false, deploymentGroupName: "${params.CODEDEPLOY_DEP_GRP}", deploymentMethod: 'deploy', excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0, region: "${REGION}", s3bucket: "${params.ARTIFACTS_BUCKET_NAME}", s3prefix: "${ARTIFACTS_FOLDER}/${DEPLOY_ARTIFACTS_PATH}", subdirectory: 'build_artifact', versionFileName: '', waitForCompletion: true])
             }
-           // step([$class: 'AWSCodeDeployPublisher', applicationName: '', awsAccessKey: '', awsSecretKey: '', credentials: 'awsAccessKey', deploymentGroupAppspec: false, deploymentGroupName: '', deploymentMethod: 'deploy', excludes: '', iamRoleArn: '', includes: '**', proxyHost: '', proxyPort: 0, region: 'ap-northeast-1', s3bucket: '', s3prefix: '', subdirectory: '', versionFileName: '', waitForCompletion: false])
-
         }
-
     }
 }
