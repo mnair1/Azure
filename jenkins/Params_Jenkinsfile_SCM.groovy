@@ -53,31 +53,6 @@ pipeline {
                     sh "cat package.json"
                     sh "cat mongo.py"
                 }
-
-                // echo "list the directory"
-                // sh 'ls'
-                // // sh 'cd codepipeline/multi-tier-app'
-                // echo "list multi tier app directory"
-                // sh 'ls $MULTI_TIER_APP_DIRECTORY'
-
-                // echo "Existing Python code"
-                // sh 'cat $MULTI_TIER_APP_DIRECTORY/mongo.py'
-                // echo "Updating Python Code with Specs"
-                // sh "sed -i 's/<MONGO_DB>/$MONGO_DB/g' $MULTI_TIER_APP_DIRECTORY/mongo.py"
-                // sh "sed -i 's/<MONGO_HOST>/$MONGO_HOST/g' $MULTI_TIER_APP_DIRECTORY/mongo.py"
-                // sh "sed -i 's/<MONGO_PORT>/$MONGO_PORT/g' $MULTI_TIER_APP_DIRECTORY/mongo.py"
-                // //sh "cat mongo.py"
-
-                // echo "Existing Package.json"
-                // sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
-                // echo "Updating NodeJs config with Specs"
-                // sh "sed -i 's/<VERSION_AXIOS>/$VERSION_AXIOS/g' $MULTI_TIER_APP_DIRECTORY/package.json"
-                // sh "sed -i 's/<VERSION_REACT>/$VERSION_REACT/g' $MULTI_TIER_APP_DIRECTORY/package.json"
-                // sh "sed -i 's/<VERSION_REACT_DOM>/$VERSION_REACT_DOM/g' $MULTI_TIER_APP_DIRECTORY/package.json"
-                // sh "sed -i 's/<VERSION_REACT_SCRIPTS>/$VERSION_REACT_SCRIPTS/g' $MULTI_TIER_APP_DIRECTORY/package.json"
-                // sh "sed -i 's/<FLASK_HOST>/$FLASK_HOST/g' $MULTI_TIER_APP_DIRECTORY/package.json"
-                // sh "sed -i 's/<FLASK_PORT>/$FLASK_PORT/g' $MULTI_TIER_APP_DIRECTORY/package.json"
-                // sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
             }
         }
         stage('Build') {
@@ -94,9 +69,7 @@ pipeline {
                 
                 sh "ls /datafence"
                 sh "cat /datafence/${MULTI_TIER_APP_DIRECTORY}/package.json"
-                sh "cd /datafence/${MULTI_TIER_APP_DIRECTORY} && npm install"
-                
-                
+                sh "cd /datafence/${MULTI_TIER_APP_DIRECTORY} && npm install"   
             }
              }
         stage('Post-Build') {
@@ -113,11 +86,11 @@ pipeline {
                 
                 sh "mkdir build_artifact"
                 
-                sh 'cp $JENKINS_DIRECTORY/deploy/appspec.yml artifacts_folder/'
-                sh 'cp $JENKINS_DIRECTORY/deploy/uncompress artifacts_folder/'
-                sh 'cp $JENKINS_DIRECTORY/deploy/start_flask artifacts_folder/'
-                sh 'cp $JENKINS_DIRECTORY/deploy/start_node artifacts_folder/'
-                sh 'cp $MULTI_TIER_APP_DIRECTORY/app-artifact.zip artifacts_folder/'
+                sh 'cp $JENKINS_DIRECTORY/deploy/appspec.yml build_artifact/'
+                sh 'cp $JENKINS_DIRECTORY/deploy/uncompress build_artifact/'
+                sh 'cp $JENKINS_DIRECTORY/deploy/start_flask build_artifact/'
+                sh 'cp $JENKINS_DIRECTORY/deploy/start_node build_artifact/'
+                sh 'cp $MULTI_TIER_APP_DIRECTORY/app-artifact.zip build_artifact/'
                 
                 sh 'ls build_artifact'
                 
