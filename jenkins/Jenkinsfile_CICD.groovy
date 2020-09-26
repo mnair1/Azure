@@ -26,6 +26,7 @@ pipeline {
         
         ARTIFACTS_FOLDER = "jenkins_artifacts"
         DEPLOY_ARTIFACTS_PATH = "deploy_artifacts"
+        ARTIFACT_NAME = "artifact.zip"
     }
     stages { 
         
@@ -97,7 +98,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                step([$class: 'AWSCodeDeployPublisher', applicationName: "${params.CODEDEPLOY_APP}", awsAccessKey: "${AWS_ACCESS_KEY_ID}", awsSecretKey: "${AWS_SECRET_ACCESS_KEY}", credentials: 'awsAccessKey', deploymentGroupAppspec: false, deploymentGroupName: "${params.CODEDEPLOY_DEP_GRP}", deploymentMethod: 'deploy', excludes: '', iamRoleArn: '', includes: '**', proxyHost: '', proxyPort: 0, region: "${REGION}", s3bucket: "${params.ARTIFACTS_BUCKET_NAME}", s3prefix: "${ARTIFACTS_FOLDER}/${DEPLOY_ARTIFACTS_PATH}", subdirectory: 'build_artifact', versionFileName: '', waitForCompletion: false])
+                step([$class: 'AWSCodeDeployPublisher', applicationName: "${params.CODEDEPLOY_APP}", awsAccessKey: "${AWS_ACCESS_KEY_ID}", awsSecretKey: "${AWS_SECRET_ACCESS_KEY}", credentials: 'awsAccessKey', deploymentGroupAppspec: false, deploymentGroupName: "${params.CODEDEPLOY_DEP_GRP}", deploymentMethod: 'deploy', excludes: '', iamRoleArn: '', includes: '**', proxyHost: '', proxyPort: 0, region: "${REGION}", s3bucket: "${params.ARTIFACTS_BUCKET_NAME}", s3prefix: "${ARTIFACTS_FOLDER}/${DEPLOY_ARTIFACTS_PATH}", subdirectory: 'build_artifact', versionFileName: "${ARTIFACT_NAME}", waitForCompletion: false])
             }
         }
     }
