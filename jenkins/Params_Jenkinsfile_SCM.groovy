@@ -76,15 +76,15 @@ pipeline {
                 sh "ls"
                 sh "ls /datafence"
                 sh "cat /datafence/codepipeline/multi-tier-app/package.json"
-                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
-                echo "Node Version"
-                sh 'node --version'
-                sh 'npm --version'
+                // sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
+                // echo "Node Version"
+                // sh 'node --version'
+                // sh 'npm --version'
                 
                 
-                echo "Build Started at `date`"
-                sh 'cd $MULTI_TIER_APP_DIRECTORY && npm install'
-                echo "Build Completed at `date`"
+                // echo "Build Started at `date`"
+                // sh 'cd $MULTI_TIER_APP_DIRECTORY && npm install'
+                // echo "Build Completed at `date`"
 
                 
             }
