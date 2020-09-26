@@ -30,7 +30,7 @@ pipeline {
     stages { 
         
         stage('Pre-Build') {
-            agent any
+            
             steps {
                 echo "list the directory"
                 sh 'ls'
@@ -59,7 +59,7 @@ pipeline {
             }
         }
         stage('After-Pre-Build') {
-            agent any
+           
             steps {
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
                }
@@ -83,7 +83,7 @@ pipeline {
             }
              }
         stage('Post-Build') {
-            agent any 
+            
             steps {
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
