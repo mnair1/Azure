@@ -68,8 +68,8 @@ pipeline {
             agent {
                 docker { 
                     image 'node:12' 
-                    // args '-v /var/jenkins_home/workspace/${JOB_NAME}:/datafence'
-                    args '-v ${WORKSPACE}:/datafence'
+                    args '-v /var/jenkins_home/workspace/${JOB_NAME}:/datafence'
+                    
                 }
             }
             steps {
