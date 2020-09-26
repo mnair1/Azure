@@ -14,7 +14,6 @@ pipeline {
         string(name: 'ARTIFACTS_BUCKET_NAME', defaultValue: 'devops-df-cicd-artifact-bucket-jenkins-syed', description: 'Name of S3 Artifacts Bucket')
         string(name: 'CODEDEPLOY_APP', defaultValue: 'devops-df-cicd-app', description: 'CodeDeploy Application Name')
         string(name: 'CODEDEPLOY_DEP_GRP', defaultValue: 'multi-tier-app', description: 'CodeDeploy Deployment Group Name')
-        string(name: 'DEPLOY_STEP_TIMEOUT', defaultValue: 1800, description: 'Timeout in Seconds of Jenkins Deploy Stage')
     }
     environment { 
 
@@ -98,7 +97,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                step([$class: 'AWSCodeDeployPublisher', applicationName: "${params.CODEDEPLOY_APP}", awsAccessKey: "${AWS_ACCESS_KEY_ID}", awsSecretKey: "${AWS_SECRET_ACCESS_KEY}", credentials: '', deploymentGroupAppspec: false, deploymentGroupName: "${params.CODEDEPLOY_DEP_GRP}", deploymentMethod: 'deploy', excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: ${DEPLOY_STEP_TIMEOUT}, proxyHost: '', proxyPort: 0, region: "${REGION}", s3bucket: "${params.ARTIFACTS_BUCKET_NAME}", s3prefix: "${ARTIFACTS_FOLDER}/${DEPLOY_ARTIFACTS_PATH}", subdirectory: 'build_artifact', versionFileName: '', waitForCompletion: true])
+                step([$class: 'AWSCodeDeployPublisher', applicationName: "${params.CODEDEPLOY_APP}", awsAccessKey: "${AWS_ACCESS_KEY_ID}", awsSecretKey: "${AWS_SECRET_ACCESS_KEY}", deploymentGroupName: "${params.CODEDEPLOY_DEP_GRP}", deploymentMethod: 'deploy', excludes: '', iamRoleArn: '', includes: '**', region: "${REGION}", s3bucket: "${params.ARTIFACTS_BUCKET_NAME}", s3prefix: "${ARTIFACTS_FOLDER}/${DEPLOY_ARTIFACTS_PATH}", subdirectory: 'build_artifact', versionFileName: '', waitForCompletion: false])
             }
         }
     }
