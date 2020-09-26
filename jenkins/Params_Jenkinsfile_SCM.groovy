@@ -68,7 +68,7 @@ pipeline {
             agent {
                 docker { 
                     image 'node:12' 
-                    args '-v $WORKSPACE:/datafence'
+                    args '-v /var/jenkins_home/workspace/test-pipeline-repo:/datafence'
                 }
             }
             steps {
