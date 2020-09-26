@@ -12,16 +12,6 @@ pipeline {
         string(name: 'VERSION_REACT_SCRIPTS', defaultValue: '1.1.5', description: 'Version of React Scripts')
     }
     environment { 
-        
-        // MONGO_DB = "datafencedb"
-        // MONGO_HOST = "localhost"
-        // MONGO_PORT = "27017"
-        // FLASK_HOST = "localhost"
-        // FLASK_PORT = "5000"
-        // VERSION_AXIOS = "^0.18.0"
-        // VERSION_REACT = "^16.5.1"
-        // VERSION_REACT_DOM = "^16.5.1"
-        // VERSION_REACT_SCRIPTS = "1.1.5"
 
         JENKINS_DIRECTORY = "jenkins"
         MULTI_TIER_APP_DIRECTORY = "${JENKINS_DIRECTORY}/multi-tier-app"
