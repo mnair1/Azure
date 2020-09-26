@@ -89,28 +89,24 @@ pipeline {
                 }
             }
             steps {
+                echo "Node Version"
+                sh 'npm --version'
+                
                 // echo "${JOB_NAME}"
                 // sh "pwd"
                 // sh "ls"
                 sh "ls /datafence"
-                dir("/datafence/$MULTI_TIER_APP_DIRECTORY") {
+                // dir("/datafence/$MULTI_TIER_APP_DIRECTORY") {
                     
-                    sh "cat package.json"
-                    echo "Node Version"
-                    sh 'npm --version'
-                    sh 'npm install'
+                //     sh "cat package.json"
+                //     echo "Node Version"
+                //     sh 'npm --version'
+                //     sh 'npm install'
                     
-                }
-                // sh "cat /datafence/jenkins/multi-tier-app/package.json"
-                // echo "Node Version"
-                // sh 'node --version'
-                // sh 'npm --version'
+                // }
+                sh "cat /datafence/jenkins/multi-tier-app/package.json"
+                sh 'cd /datafence/jenkins/multi-tier-app/ && npm install'
                 
-                
-                // echo "Build Started at `date`"
-                // sh 'cd /datafence/jenkins/multi-tier-app/ && npm install'
-                // echo "Build Completed at `date`"
-
                 
             }
              }
