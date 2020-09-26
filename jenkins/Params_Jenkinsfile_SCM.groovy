@@ -66,9 +66,13 @@ pipeline {
            }
         stage('Build') {
             agent {
-                docker { image 'node:12' }
+                docker { 
+                    image 'node:12' 
+                    args '-v $WORKSPACE:/'
+                }
             }
             steps {
+                sh "ls"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
                 echo "Node Version"
                 sh 'node --version'
