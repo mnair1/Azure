@@ -68,19 +68,20 @@ pipeline {
             agent {
                 docker { 
                     image 'node:12' 
-                    args '-v $WORKSPACE:/'
+                    args '-v $WORKSPACE:$MULTI_TIER_APP_DIRECTORY/'
                 }
             }
             steps {
                 sh "ls"
-                sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
+                // sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
+                sh "cat package.json"
                 echo "Node Version"
                 sh 'node --version'
                 sh 'npm --version'
                 
                 
                 echo "Build Started at `date`"
-                sh 'cd $MULTI_TIER_APP_DIRECTORY && npm install'
+                sh 'npm install'
                 echo "Build Completed at `date`"
 
                 
@@ -91,6 +92,7 @@ pipeline {
             steps {
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
+                sh "ls $MULTI_TIER_APP_DIRECTORY/"
                 // sh "sudo apt-get update && sudo apt-get install zip"
                 // echo "Compressing the artifacts"
                 // sh 'cd $MULTI_TIER_APP_DIRECTORY/ && zip --symlinks -r app-artifact.zip .'
