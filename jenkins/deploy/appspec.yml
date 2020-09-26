@@ -1,7 +1,7 @@
 version: 0.0
 os: linux
 files:
-  - source: app-artifact.zip
+  - source: app-artifact.tar.gz
     destination: /home/ubuntu/datafence_app/
 hooks:
   AfterInstall:

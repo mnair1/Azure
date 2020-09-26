@@ -85,5 +85,18 @@ pipeline {
                 
             }
         }
+        stage('Deploy') {
+           
+            steps {
+
+                sh 'ls'
+                sh 'ls build_artifact'
+
+                step([$class: 'AWSCodeDeployPublisher', applicationName: 'devops-df-cicd-app', awsAccessKey: '', awsSecretKey: '', credentials: 'awsAccessKey', deploymentGroupAppspec: false, deploymentGroupName: 'multi-tier-app', deploymentMethod: 'deploy', excludes: '', iamRoleArn: '', includes: '**', pollingFreqSec: 15, pollingTimeoutSec: 900, proxyHost: '', proxyPort: 0, region: 'us-east-1', s3bucket: 'devops-df-cicd-artifact-bucket-jenkins-syed', s3prefix: 'jenkins_artifacts/deploy_artifacts', subdirectory: 'build_artifact', versionFileName: '', waitForCompletion: true])
+            }
+           // step([$class: 'AWSCodeDeployPublisher', applicationName: '', awsAccessKey: '', awsSecretKey: '', credentials: 'awsAccessKey', deploymentGroupAppspec: false, deploymentGroupName: '', deploymentMethod: 'deploy', excludes: '', iamRoleArn: '', includes: '**', proxyHost: '', proxyPort: 0, region: 'ap-northeast-1', s3bucket: '', s3prefix: '', subdirectory: '', versionFileName: '', waitForCompletion: false])
+
+        }
+
     }
 }
