@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent any
     parameters {
         string(name: 'CODEBUILD_PROJ_NAME', defaultValue: '', description: 'CodeBuild Project Name')
         string(name: 'ARTIFACTS_BUCKET_NAME', defaultValue: '', description: 'Name of S3 Artifacts Bucket')
