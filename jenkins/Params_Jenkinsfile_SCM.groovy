@@ -76,15 +76,14 @@ pipeline {
                 sh "ls"
                 sh "ls /datafence"
                 sh "cat /datafence/codepipeline/multi-tier-app/package.json"
-                // sh "cat $MULTI_TIER_APP_DIRECTORY/package.json" 
-                // echo "Node Version"
-                // sh 'node --version'
-                // sh 'npm --version'
+                echo "Node Version"
+                sh 'node --version'
+                sh 'npm --version'
                 
                 
-                // echo "Build Started at `date`"
-                // sh 'cd $MULTI_TIER_APP_DIRECTORY && npm install'
-                // echo "Build Completed at `date`"
+                echo "Build Started at `date`"
+                sh 'cd /datafence && npm install'
+                echo "Build Completed at `date`"
 
                 
             }
@@ -92,8 +91,6 @@ pipeline {
         stage('Post-Build') {
             
             steps {
-                sh "pwd"
-                echo "$WORKSPACE"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/package.json"
                 sh "cat $MULTI_TIER_APP_DIRECTORY/mongo.py"
                 sh "ls $MULTI_TIER_APP_DIRECTORY/"
