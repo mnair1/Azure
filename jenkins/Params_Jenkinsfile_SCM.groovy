@@ -68,7 +68,7 @@ pipeline {
             agent {
                 docker { 
                     image 'node:12' 
-                    args '-v $WORKSPACE:$MULTI_TIER_APP_DIRECTORY/'
+                    args '-v $WORKSPACE:/$MULTI_TIER_APP_DIRECTORY/'
                 }
             }
             steps {
