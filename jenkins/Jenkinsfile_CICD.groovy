@@ -97,10 +97,12 @@ pipeline {
             }
         }
         stage('Deploy') {
-            timeout(time: 15, unit: "MINUTES") {
-                input {
-                    message "Want to proceed with the deployment"
-                    ok "Yes"
+            options {
+                timeout(time: 15, unit: "MINUTES") {
+                    input {
+                        message "Want to proceed with the deployment"
+                        ok "Yes"
+                    }
                 }
             }
             steps {
