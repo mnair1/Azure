@@ -102,7 +102,7 @@ pipeline {
                 message "Want to proceed with the deployment"
                 ok "Yes"
             }
-            step {
+            steps {
                 sh "Build has been approved"
             }
             
