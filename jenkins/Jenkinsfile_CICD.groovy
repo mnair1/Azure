@@ -12,8 +12,8 @@ pipeline {
         string(name: 'VERSION_REACT_SCRIPTS', defaultValue: '1.1.5', description: 'Version of React Scripts')
         
         string(name: 'ARTIFACTS_BUCKET_NAME', defaultValue: 'devops-df-cicd-artifact-bucket-jenkins-syed', description: 'Name of S3 Artifacts Bucket')
-        string(name: 'CODEDEPLOY_APP', defaultValue: 'devops-df-cicd-app', description: 'CodeDeploy Application Name')
-        string(name: 'CODEDEPLOY_DEP_GRP', defaultValue: 'multi-tier-app', description: 'CodeDeploy Deployment Group Name')
+        string(name: 'CODEDEPLOY_APP', defaultValue: 'devops-df-jenkins-deploy-app', description: 'CodeDeploy Application Name')
+        string(name: 'CODEDEPLOY_DEP_GRP', defaultValue: 'multi-tier-ec2', description: 'CodeDeploy Deployment Group Name')
     }
     environment { 
 
