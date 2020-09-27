@@ -97,9 +97,11 @@ pipeline {
             }
         }
         stage('Approval') {
-            input {
-                message "Want to proceed with the deployment"
-                ok "Yes"
+            timeout(time: 15, unit: "MINUTES") {
+                input {
+                    message "Want to proceed with the deployment"
+                    ok "Yes"
+                }
             }
         }
         stage('Deploy') {
