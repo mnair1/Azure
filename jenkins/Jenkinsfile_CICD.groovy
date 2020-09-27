@@ -98,12 +98,14 @@ pipeline {
         }
         stage('Approval') {
             agent none
-            steps {
-               input {
+            input {
                 message "Want to proceed with the deployment"
                 ok "Yes"
             }
+            step {
+                sh "Build has been approved"
             }
+            
         }
         stage('Deploy') {
             
