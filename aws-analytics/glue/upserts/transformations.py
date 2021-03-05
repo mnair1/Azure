@@ -13,7 +13,18 @@ from awsglue.utils import getResolvedOptions
 athena_client = boto3.client('athena', 'us-east-1')
 
 sc = SparkContext()
+# Edit below path as per your jar location 
 sc.addPyFile("s3://aws-analytics-course/jars/io.delta_delta-core_2.11-0.6.1.jar")
+
+# Edit below variables as per your S3 loactions
+source_init_file_path = 's3://aws-analytics-course/raw/dms/fossil/coal_prod/LOAD*.csv'
+source_incr_file_path = 's3://aws-analytics-course/raw/dms/fossil/coal_prod/'+INCRFILE_PREFIX+'*.csv'
+raw_bucket='aws-analytics-course'
+athena_res_path = 's3://aws-athena-query-results-175908995626-us-east-1/'
+delta_path = "s3a://aws-analytics-course/transformed/non-renewable/coal_prod/"
+table_name = 'delta_coal_prod'
+database_name = 'non-renewable'
+
 
 from delta.tables import *
 from pyspark.sql.functions import *
@@ -41,11 +52,6 @@ LAST_DAY = datetime.datetime.strptime(JOB_DATE, '%Y-%m-%d').date() - timedelta(d
 PARTITION='dt='+str(LAST_DAY)
 INCRFILE_PREFIX=str(LAST_DAY.strftime('%Y')+LAST_DAY.strftime('%m')+LAST_DAY.strftime('%d'))
 
-source_init_file_path = 's3://aws-analytics-course/raw/dms/fossil/coal_prod/LOAD*.csv'
-source_incr_file_path = 's3://aws-analytics-course/raw/dms/fossil/coal_prod/'+INCRFILE_PREFIX+'*.csv'
-raw_bucket='aws-analytics-course'
-
-delta_path = "s3a://aws-analytics-course/transformed/non-renewable/coal_prod/"
 
 coal_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
@@ -54,14 +60,14 @@ coal_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Production", DecimalType(10,2)),
                                StructField("Consumption", DecimalType(10,2))
                                ])
-    
+
 def insert_data(spark):
     data = spark.read.csv(source_init_file_path, header='false', schema=coal_prod_schema)
     data.show()
     data.write.format("delta").save(delta_path)
     delta_table = DeltaTable.forPath(spark, delta_path)
     delta_table.generate("symlink_format_manifest")
-	
+
 def upsert_data(spark):
     delta_table = DeltaTable.forPath(spark, delta_path)
     data = spark.read.csv(source_incr_file_path, header='false', schema=coal_prod_schema)
@@ -69,26 +75,25 @@ def upsert_data(spark):
         source = data.alias("source"),
         condition = "target.Entity  = source.Entity AND target.Year  = source.Year"
     ).whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
-    delta_table.delete("Mode = 'D'") 
+    delta_table.delete("Mode = 'D'")
     delta_table.generate("symlink_format_manifest")
-	
+
 def reload_table_partitions():
     athena_client.start_query_execution(
-        QueryString='MSCK REPAIR TABLE delta_coal_prod;',
+        QueryString='MSCK REPAIR TABLE '+table_name+';',
         QueryExecutionContext={
-            'Database': 'non-renewable'
+            'Database': database_name
         },
         ResultConfiguration={
-            'OutputLocation': 's3://aws-athena-query-results-175908995626-us-east-1/'
+            'OutputLocation': athena_res_path
         }
-    )	
+    )
 
-if __name__ == '__main__':	
+if __name__ == '__main__':
 
     if DeltaTable.isDeltaTable(spark, delta_path):
         upsert_data(spark)
     else:
         insert_data(spark)
-		
-    reload_table_partitions()
 
+    reload_table_partitions()
