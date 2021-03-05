@@ -1,0 +1,56 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::aws-glue-jes-prod-us-east-1-assets"
+            ]
+        },
+        {
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::aws-glue-jes-prod-us-east-1-assets*"
+            ]
+        },
+        {
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+                "logs:CreateLogGroup"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:logs:us-east-1:369626215919:log-group:/aws/sagemaker/*",
+                "arn:aws:logs:us-east-1:369626215919:log-group:/aws/sagemaker/*:log-stream:aws-glue-*"
+            ]
+        },
+        {
+            "Action": [
+                "glue:UpdateDevEndpoint",
+                "glue:GetDevEndpoint",
+                "glue:GetDevEndpoints"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:glue:us-east-1:369626215919:devEndpoint/*"
+            ]
+        },
+        {
+            "Action": [
+                "sagemaker:ListTags"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:sagemaker:us-east-1:369626215919:notebook-instance/*"
+            ]
+        }
+    ]
+}
