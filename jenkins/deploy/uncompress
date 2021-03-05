@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /home/ubuntu/datafence_app/
+tar xvzf app-artifact.tar.gz

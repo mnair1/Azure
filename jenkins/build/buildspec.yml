@@ -1,0 +1,84 @@
+version: 0.2
+
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  #secrets-manager:
+     # key: secret-id:json-key:version-stage:version-id
+     # key: secret-id:json-key:version-stage:version-id
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+  pre_build:
+    commands:
+      - echo "Node Version"
+      - npm --version
+      - echo "list the directory"
+      - ls
+      - cd codepipeline/multi-tier-app
+      - echo "list multi tier app directory"
+      - ls
+
+      - echo "Existing Python code"
+      - cat mongo.py
+      - echo "Updating Python Code with Specs"
+      - sed -i "s/<MONGO_DB>/$MONGO_DB/g" mongo.py
+      - sed -i "s/<MONGO_HOST>/$MONGO_HOST/g" mongo.py
+      - sed -i "s/<MONGO_PORT>/$MONGO_PORT/g" mongo.py
+      # - cat mongo.py
+
+      - echo "Existing Package.json"
+      - cat package.json
+      - echo "Updating NodeJs config with Specs"
+      - sed -i "s/<VERSION_AXIOS>/$VERSION_AXIOS/g" package.json
+      - sed -i "s/<VERSION_REACT>/$VERSION_REACT/g" package.json
+      - sed -i "s/<VERSION_REACT_DOM>/$VERSION_REACT_DOM/g" package.json
+      - sed -i "s/<VERSION_REACT_SCRIPTS>/$VERSION_REACT_SCRIPTS/g" package.json
+      - sed -i "s/<FLASK_HOST>/$FLASK_HOST/g" package.json
+      - sed -i "s/<FLASK_PORT>/$FLASK_PORT/g" package.json
+      - cat package.json
+
+  build:
+    commands:
+      - echo "Build Started at `date`"
+      - npm install
+      - echo "Build Completed at `date`"
+  post_build:
+    commands:
+      
+      - echo "Compressing the artifacts"
+      # - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec.yml .
+      # - mkdir scripts
+      # - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_flask scripts/
+      # - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_node scripts/
+      # - zip --symlinks -r devops-df-build-artifact.zip .
+      - zip --symlinks -r app-artifact.zip .
+      - ls
+      - cat mongo.py
+      - cat package.json
+      - cd ../../
+      # - cp codepipeline/multi-tier-app/devops-df-build-artifact.zip .
+      - cp codepipeline/multi-tier-app/app-artifact.zip .
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/appspec.yml .
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/uncompress .
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_flask .
+      - cp $CODEBUILD_SRC_DIR/codepipeline/deploy/start_node .
+
+artifacts:
+  files:
+    # - '**/*'
+    # - devops-df-build-artifact.zip
+    - app-artifact.zip
+    - appspec.yml
+    - uncompress
+    - start_node
+    - start_flask
+  name: devops-df-build-artifact.zip
+  # name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location

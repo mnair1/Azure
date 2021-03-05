@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /home/ubuntu/datafence_app/
+nohup python3 mongo.py > /dev/null 2> /dev/null < /dev/null &

@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template has the capability to create either an internet-facing or internal Application Load Balancer with HTTP->HTTPS redirection and optional WAF 
+
+
+Parameters:
+
+  AlbName:
+    Type: String
+    Description: Application Load Balancer Name
+    Default: datafence-infra-alb
+  
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-050d8440b945b3f03
+  
+  PublicSubnet01:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-069cac3861f46bea0
+
+  PublicSubnet02:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-08980be988cf8fb84
+
+  PrivateSubnet01:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0051438a84782c157
+
+  PrivateSubnet02:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0359d5b6b5b2d0744
+
+  AmiId:
+    Type: String
+    Default: ami-06b263d6ceff0b3dd
+
+  AsgInstanceType:
+    Type: String
+    Default: t2.micro
+  
+
+  
+Resources:
+
+  datafenceSgAlb:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcId
+      GroupName: !Sub Alb-${AWS::StackName}
+      GroupDescription: !Sub ${AlbName}-SG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 1214
+          ToPort: 1214
+          CidrIp: 0.0.0.0/0
+          Description: HTTP
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+          Description: all
+      
+  datafenceAlb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Ref AlbName
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref datafenceSgAlb
+      Subnets:
+        - !Ref PublicSubnet01
+        - !Ref PublicSubnet02
+      
+  datafenceListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref datafenceAlb
+      Port: 1214
+      Protocol: HTTP
+      DefaultActions:
+        - TargetGroupArn: !Ref datafenceTargetGroup
+          Type: forward
+      
+  datafenceTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${AlbName}-TG
+      Port: 3000
+      Protocol: HTTP
+      Matcher:
+        HttpCode: 200
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 5
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: "/"
+      HealthCheckPort: traffic-port
+      HealthCheckProtocol: HTTP
+      VpcId: !Ref VpcId
+
+  datafenceLaunchConfigSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcId
+      GroupName: !Sub ALB-SG-${AWS::StackName}
+      GroupDescription: Alb Access
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          SourceSecurityGroupId: !GetAtt datafenceSgAlb.GroupId
+          Description: AlB Access
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+          Description: all
+
+  datafenceASGRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      RoleName: devops-infra-asg-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+  datafenceASGRoleInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref datafenceASGRole
+      InstanceProfileName: !Sub devops-infra-asg-role-instance-profile
+
+  datafenceLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      IamInstanceProfile: !Ref datafenceASGRoleInstanceProfile
+      ImageId: !Ref AmiId
+      InstanceType: !Ref AsgInstanceType
+      SecurityGroups:
+        - !Ref datafenceLaunchConfigSG
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -x
+          apt update
+          apt install python3-pip -y
+          pip3 install flask==1.0.2
+          pip3 install flask_pymongo==2.3.0
+          pip3 install flask_cors==3.0.7
+          apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates && curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+          apt -y install nodejs
+          apt install -y mongodb
+          apt install -y ruby
+          apt install -y awscli
+          cd /home/ubuntu
+          aws s3 cp s3://aws-codedeploy-us-east-2/latest/install . --region us-east-2
+          chmod +x ./install
+          ./install auto
+
+  datafenceASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: datafence-infra-asg
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet01
+        - !Ref PrivateSubnet02
+      Cooldown: 120
+      DesiredCapacity: 1
+      MinSize: 1
+      MaxSize: 1
+      HealthCheckGracePeriod: 120
+      HealthCheckType: ELB
+      LaunchConfigurationName: !Ref datafenceLaunchConfig
+      TargetGroupARNs:
+        - !Ref datafenceTargetGroup
+    
