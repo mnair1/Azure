@@ -9,10 +9,11 @@ from dateutil import relativedelta
 from awsglue.job import Job
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
+from awsglue.utils import getResolvedOptions
 athena_client = boto3.client('athena', 'us-east-1')
 
 sc = SparkContext()
-sc.addPyFile("s3://aws-analytics-deltalake/jars/io.delta_delta-core_2.11-0.6.1.jar")
+sc.addPyFile("s3://aws-analytics-course/jars/io.delta_delta-core_2.11-0.6.1.jar")
 
 from delta.tables import *
 from pyspark.sql.functions import *
@@ -26,7 +27,7 @@ spark = glueContext.spark_session.builder.config("spark.sql.extensions", "io.del
 conf = spark.sparkContext._conf.setAll([('spark.delta.logStore.class','org.apache.spark.sql.delta.storage.S3SingleDriverLogStore')])
 spark.sparkContext._conf.getAll()
 
-INTERACTIVE=True
+INTERACTIVE=False
 DEBUG=True
 
 if INTERACTIVE:
@@ -40,11 +41,11 @@ LAST_DAY = datetime.datetime.strptime(JOB_DATE, '%Y-%m-%d').date() - timedelta(d
 PARTITION='dt='+str(LAST_DAY)
 INCRFILE_PREFIX=str(LAST_DAY.strftime('%Y')+LAST_DAY.strftime('%m')+LAST_DAY.strftime('%d'))
 
-source_init_file_path = 's3://aws-analytics-assignments/raw/dms/fossil/coal_prod/LOAD*.csv'
-source_incr_file_path = 's3://aws-analytics-assignments/raw/dms/fossil/coal_prod/'+INCRFILE_PREFIX+'*.csv'
-raw_bucket='aws-analytics-assignments'
+source_init_file_path = 's3://aws-analytics-course/raw/dms/fossil/coal_prod/LOAD*.csv'
+source_incr_file_path = 's3://aws-analytics-course/raw/dms/fossil/coal_prod/'+INCRFILE_PREFIX+'*.csv'
+raw_bucket='aws-analytics-course'
 
-delta_path = "s3a://aws-analytics-deltalake/curated/delta_coal_prod/"
+delta_path = "s3a://aws-analytics-course/transformed/non-renewable/coal_prod/"
 
 coal_prod_schema = StructType([StructField("Mode", StringType()),
                                StructField("Entity", StringType()),
@@ -56,6 +57,7 @@ coal_prod_schema = StructType([StructField("Mode", StringType()),
     
 def insert_data(spark):
     data = spark.read.csv(source_init_file_path, header='false', schema=coal_prod_schema)
+    data.show()
     data.write.format("delta").save(delta_path)
     delta_table = DeltaTable.forPath(spark, delta_path)
     delta_table.generate("symlink_format_manifest")
@@ -77,7 +79,7 @@ def reload_table_partitions():
             'Database': 'non-renewable'
         },
         ResultConfiguration={
-            'OutputLocation': 's3://amazon-athena-result-s3/'
+            'OutputLocation': 's3://aws-athena-query-results-175908995626-us-east-1/'
         }
     )	
 
